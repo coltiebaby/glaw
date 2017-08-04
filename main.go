@@ -17,6 +17,8 @@ func main() {
 
     // Creating the routes
     mux.Handle("/champions/mastery/all", riot.DefaultOutputHandler(m.MasteryAllChampions))
+    mux.Handle("/champion/mastery/", riot.DefaultOutputHandler(m.MasteryGetChampion))
+    mux.Handle("/champion/mastery/total/", riot.DefaultOutputHandler(m.MasterySummonerScore))
 
     log.Println("Listening...")
     http.ListenAndServe(":3000", mux)
