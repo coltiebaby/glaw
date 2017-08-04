@@ -1,7 +1,9 @@
 package riot
 
 import (
+    "fmt"
     "log"
+    "io/ioutil"
     "net/http"
 )
 import c "vs/config"
@@ -12,7 +14,7 @@ var config = c.GetConfig()
 var Version = config.Version
 
 
-func AddHeaders(req *http.Request) {
+func add_headers(req *http.Request) {
     req.Header.Add("X-Riot-Token", config.Api.Token)
 }
 
@@ -35,4 +37,19 @@ func DefaultOutputHandler(fn defaultapi) (http.HandlerFunc) {
     }
 
     return http.HandlerFunc(handler)
+}
+
+func GetData(http_method string, uri string) ([]byte, error) {
+    var err error
+
+    url := fmt.Sprintf("%s%s", Url, uri)
+
+    req, _ := http.NewRequest("GET", url, nil)
+    add_headers(req)
+    resp, _ := Client.Do(req)
+
+    defer resp.Body.Close()
+    body, _ := ioutil.ReadAll(resp.Body)
+
+    return body, err
 }
