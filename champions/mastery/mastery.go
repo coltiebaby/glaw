@@ -2,28 +2,41 @@ package mastery
 
 import (
     "fmt"
-    "io/ioutil"
-    "net/http"
+    "log"
     "vs/riot"
 )
+
+var mastery = fmt.Sprintf("/champion-mastery/%s/", riot.Version)
 
 func MasteryAllChampions() ([]byte, error) {
     // All Champion Mastery
     // Ask Riot for all the summoners champions based on mastery score.
 
-    // TODO: Make an actual error here
-    var err error
+    uri := mastery + "champion-masteries/by-summoner/%s"
+    uri = fmt.Sprintf(uri, "28747969")
 
-    uri := "/champion-mastery/%s/champion-masteries/by-summoner/%s"
-    uri = fmt.Sprintf(uri, riot.Version, "28747969")
-    url := fmt.Sprintf("%s%s", riot.Url, uri)
+    log.Println("Requesting MasteryAllChampions...")
+    return riot.GetData("GET", uri)
+}
 
-    req, _ := http.NewRequest("GET", url, nil)
-    riot.AddHeaders(req)
-    resp, _ := riot.Client.Do(req)
+func MasteryGetChampion() ([]byte, error) {
+    // Get Champion Score
+    // Find summoner score for a single champion
 
-    defer resp.Body.Close()
+    uri := mastery + "champion-masteries/by-summoner/%s/by-champion/%s"
+    uri = fmt.Sprintf(uri, "28747969", "12")
 
-    body, _ := ioutil.ReadAll(resp.Body)
-    return body, err
+    log.Println("Requesting MasteryGetChampion...")
+    return riot.GetData("GET", uri)
+}
+
+func MasterySummonerScore() ([]byte, error) {
+    // SummonerScore
+    // Find the total score for all champions across the board
+
+    uri := mastery + "scores/by-summoner/%s"
+    uri = fmt.Sprintf(uri, "28747969")
+
+    log.Println("Requesting MasterySummonerScore...")
+    return riot.GetData("GET", uri)
 }
