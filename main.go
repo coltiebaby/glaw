@@ -7,19 +7,45 @@ import (
     // "io/ioutil"
     "log"
     "net/http"
-    "vs/riot"
+
+    "github.com/julienschmidt/httprouter"
 )
 
 import m "vs/champions/mastery"
 
+type apiNoParams func() ([]byte, error)
+type apiParams func(*httprouter.Params) ([]byte, error)
+
+func noParams(fn apiNoParams) (httprouter.Handle) {
+    return func(w http.ResponseWriter, r *http.Request,  _ httprouter.Params) {
+        body, err := fn()
+        if err != nil {
+            log.Fatalf("DefaultOutputHandler found an err: %v", err)
+        }
+
+        w.Write(body)
+    }
+}
+
+func hasParams(fn apiParams) (httprouter.Handle) {
+    return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+        body, err := fn(&ps)
+        if err != nil {
+            log.Fatalf("DefaultOutputHandler found an err: %v", err)
+        }
+
+        w.Write(body)
+    }
+}
+
 func main() {
-    mux := http.NewServeMux()
+    router := httprouter.New()
 
     // Creating the routes
-    mux.Handle("/champions/mastery/all", riot.DefaultOutputHandler(m.MasteryAllChampions))
-    mux.Handle("/champion/mastery/", riot.DefaultOutputHandler(m.MasteryGetChampion))
-    mux.Handle("/champion/mastery/total/", riot.DefaultOutputHandler(m.MasterySummonerScore))
+    router.GET("/summoner/:summoner_id/champion/masteries", hasParams(m.MasteryAllChampions))
+    //router.GET("/summoner/:summoner_id/champion/:champion_id/mastery", hasParams(m.MasteryGetChampion))
+    //router.GET("/summoner/:summoner_id/champion/mastery/sum", hasParams(m.MasterySummonerScore))
 
     log.Println("Listening...")
-    http.ListenAndServe(":3000", mux)
+    http.ListenAndServe(":3000", router)
 }
