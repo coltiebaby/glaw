@@ -2,7 +2,6 @@ package riot
 
 import (
     "fmt"
-    "log"
     "io/ioutil"
     "net/http"
 )
@@ -22,21 +21,6 @@ func add_headers(req *http.Request) {
 // Not sure if this is the best practice
 var Client = &http.Client{
 //    CheckRedirect: redirectPolicyFunc,
-}
-
-type defaultapi func() ([]byte, error)
-
-func DefaultOutputHandler(fn defaultapi) (http.HandlerFunc) {
-    var handler = func(w http.ResponseWriter, r *http.Request) {
-        body, err := fn()
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
-
-        w.Write(body)
-    }
-
-    return http.HandlerFunc(handler)
 }
 
 func GetData(http_method string, uri string) ([]byte, error) {
