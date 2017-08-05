@@ -7,13 +7,13 @@ import (
     "github.com/julienschmidt/httprouter"
 )
 
+var mastery = fmt.Sprintf("/champion-mastery/%s/", Version)
+
 func mastery_init(router *httprouter.Router) {
-    router.GET("/summoner/:summoner_id/champion/masteries", hasParams(MasteryAllChampions))
+    router.GET("/masteries/all/:summoner_id", hasParams(MasteryAllChampions))
     //router.GET("/summoner/:summoner_id/champion/:champion_id/mastery", hasParams(m.MasteryGetChampion))
     //router.GET("/summoner/:summoner_id/champion/mastery/sum", hasParams(m.MasterySummonerScore))
 }
-
-var mastery = fmt.Sprintf("/champion-mastery/%s/", Version)
 
 func MasteryAllChampions(ps *httprouter.Params) ([]byte, error) {
     // All Champion Mastery
