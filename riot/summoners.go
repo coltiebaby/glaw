@@ -6,6 +6,12 @@ import (
     "github.com/julienschmidt/httprouter"
 )
 
+type Summoner struct {
+    ACCOUNT_ID int `json:"accountId"`
+    ID int `json:"id"`
+    NAME string `json:"name"`
+}
+
 var summoner_uri = fmt.Sprintf("/summoner/%s/summoners/", Version)
 
 func summoner_init(router *httprouter.Router) {
