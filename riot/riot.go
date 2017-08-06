@@ -32,6 +32,7 @@ func BuildUrls(router *httprouter.Router) {
     // Bread and butter of the package
     mastery_init(router)
     summoner_init(router)
+    champion_init(router)
 }
 
 func GetData(http_method string, uri string) ([]byte, error) {
