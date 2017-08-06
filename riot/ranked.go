@@ -21,8 +21,8 @@ var ranked_uri = fmt.Sprintf("/league/%s/", Version)
 
 func ranked_init(router *httprouter.Router) {
     router.GET("/ranked/leaderboard/:tier_id/:queue_id", hasParams(rankedLeaderBoard))
-    router.GET("/ranked/summoner/:summoner_name", hasParams(rankedSummoner))
-    router.GET("/ranked/stats/:summoner_name", hasParams(rankedPositions))
+    router.GET("/ranked/summoner/:summoner_name", paramsWithSummoner(rankedSummoner))
+    router.GET("/ranked/stats/:summoner_name", paramsWithSummoner(rankedPositions))
 }
 
 func findQueueID(queue_type string) (string, error) {
@@ -67,19 +67,13 @@ func rankedLeaderBoard(ps *httprouter.Params) ([]byte, error) {
     return GetData("GET", uri)
 }
 
-func rankedSummoner(ps *httprouter.Params) ([]byte, error) {
-    var summoner Summoner
-    summoner = findSummonerByName(ps.ByName("summoner_name"))
-
+func rankedSummoner(ps *httprouter.Params, summoner *Summoner) ([]byte, error) {
     uri := ranked_uri + fmt.Sprintf("leagues/by-summoner/%v", summoner.ID)
 
     return GetData("GET", uri)
 }
 
-func rankedPositions(ps *httprouter.Params) ([]byte, error) {
-    var summoner Summoner
-    summoner = findSummonerByName(ps.ByName("summoner_name"))
-
+func rankedPositions(ps *httprouter.Params, summoner *Summoner) ([]byte, error) {
     uri := ranked_uri + fmt.Sprintf("positions/by-summoner/%v", summoner.ID)
 
     return GetData("GET", uri)
