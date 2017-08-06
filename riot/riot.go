@@ -1,6 +1,7 @@
 package riot
 
 import (
+    "encoding/json"
     "fmt"
     "io/ioutil"
     "log"
@@ -33,6 +34,7 @@ func BuildUrls(router *httprouter.Router) {
     mastery_init(router)
     summoner_init(router)
     champion_init(router)
+    ranked_init(router)
 }
 
 func GetData(http_method string, uri string) ([]byte, error) {
@@ -70,4 +72,32 @@ func hasParams(fn apiParams) (httprouter.Handle) {
 
         w.Write(body)
     }
+}
+
+func findSummonerByName(summoner_name string) (Summoner) {
+    var (
+        body []byte
+        err  error
+        s    Summoner
+    )
+
+    // params := &httprouter.Params{}
+    // param := &httprouter.Param{
+    //     Key: "summoner_id",
+    //     Value: summoner_name,
+    // }
+    // params = append(params, param)
+    // body, err := summonerFindByName(params)
+
+    params := httprouter.Params{
+        httprouter.Param{"summoner_id", summoner_name},
+    }
+
+    body, err = summonerFindByName(&params)
+
+    if err = json.Unmarshal(body, &s); err != nil {
+        fmt.Println("error here for unmarshal")
+    }
+
+    return s
 }

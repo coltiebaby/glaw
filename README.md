@@ -12,7 +12,7 @@ why you're making a change. I'll greatly appreciate it.
 
    - ~~champions~~
    - ~~champion-masteries~~
-   - league
+   - ~~league~~
    - match
    - masteries
    - runes
