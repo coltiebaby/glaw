@@ -13,8 +13,8 @@ why you're making a change. I'll greatly appreciate it.
    - ~~champions~~
    - ~~champion-masteries~~
    - ~~league~~
+   - ~~masteries~~
    - match
-   - masteries
    - runes
    - status
    - static-data
