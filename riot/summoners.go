@@ -2,41 +2,62 @@ package riot
 
 import (
     "fmt"
-
-    "github.com/julienschmidt/httprouter"
+    "encoding/json"
 )
 
 type Summoner struct {
-    ACCOUNT_ID int `json:"accountId"`
-    ID int `json:"id"`
-    NAME string `json:"name"`
+	ID            int    `json:"id"`
+	AccountID     int    `json:"accountId"`
+	Name          string `json:"name"`
+	ProfileIconID int    `json:"profileIconId"`
+	RevisionDate  int64  `json:"revisionDate"`
+	SummonerLevel int    `json:"summonerLevel"`
 }
 
-var summoner_uri = fmt.Sprintf("/summoner/%s/summoners/", Version)
 
-func summoner_init(router *httprouter.Router) {
-    router.GET("/summoner/name/:summoner_id", hasParams(summonerFindByName))
-    router.GET("/summoner/account/:summoner_id", hasParams(summonerFindByAccount))
-    router.GET("/summoner/id/:summoner_id", hasParams(summonerFindByID))
+func GetSummonerByAccount(account_id int) (Summoner) {
+    // /lol/summoner/v3/summoners/by-account/{accountId}
+    var summoner Summoner
+
+    rr := &RiotRequest {
+        Type: "summoner",
+        Uri:  fmt.Sprintf("summoners/by-account/%s", account_id),
+    }
+
+    resp := rr.GetData()
+    json.Unmarshal(resp, &summoner)
+
+    return summoner
 }
 
-func summonerFindByName(ps *httprouter.Params) ([]byte, error) {
-    uri := summoner_uri + "by-name/%s"
-    uri = fmt.Sprintf(uri, ps.ByName("summoner_id"))
 
-    return GetData("GET", uri)
+func GetSummonerById(summoner_id int) (Summoner) {
+    // /lol/summoner/v3/summoners/{summonerId}
+    var summoner Summoner
+
+    rr := &RiotRequest {
+        Type: "summoner",
+        Uri:  fmt.Sprintf("summoners/%s", summoner_id),
+    }
+
+    resp := rr.GetData()
+    json.Unmarshal(resp, &summoner)
+
+    return summoner
 }
 
-func summonerFindByAccount(ps *httprouter.Params) ([]byte, error) {
-    uri := summoner_uri + "by-account/%s"
-    uri = fmt.Sprintf(uri, ps.ByName("summoner_id"))
 
-    return GetData("GET", uri)
-}
+func GetSummonerByName(name string) (Summoner) {
+    // /lol/summoner/v3/summoners/by-name/{summonerName}
+    var summoner Summoner
 
-func summonerFindByID(ps *httprouter.Params) ([]byte, error) {
-    uri := summoner_uri + "%s"
-    uri = fmt.Sprintf(uri, ps.ByName("summoner_id"))
+    rr := &RiotRequest {
+        Type: "summoner",
+        Uri:  fmt.Sprintf("summoners/by-name/%s", name),
+    }
 
-    return GetData("GET", uri)
+    resp := rr.GetData()
+    json.Unmarshal(resp, &summoner)
+
+    return summoner
 }

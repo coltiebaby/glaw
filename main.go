@@ -1,18 +1,15 @@
 package main
 
 import (
-    "log"
-    "net/http"
-
-    "github.com/julienschmidt/httprouter"
-
-    "vs/riot"
+    "fmt"
+    "g-law/riot"
 )
 
-func main() {
-    router := httprouter.New()
-    riot.BuildUrls(router)
 
-    log.Println("Listening...")
-    http.ListenAndServe(":3000", router)
+func main() {
+    fmt.Println("hello world")
+    // s := riot.GetSummonerByName("Oscillation")
+    c := riot.GetFreeChampion(1)
+    // fmt.Printf("%s\n", s)
+    fmt.Printf("%s\n", c)
 }

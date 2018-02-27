@@ -2,87 +2,43 @@ package riot
 
 import (
     "fmt"
-    "io/ioutil"
-    "log"
     "net/http"
+    "net/url"
+    "g-law/config"
 
-    "github.com/julienschmidt/httprouter"
+    "io/ioutil"
 )
-import c "vs/config"
 
-const Url = "https://na1.api.riotgames.com/lol"
+var Client = &http.Client{}
+var c = config.GetConfig()
 
-var config = c.GetConfig()
-var Version = config.Version
-
-type apiNoParams func() ([]byte, error)
-type apiParams func(*httprouter.Params) ([]byte, error)
-type summonerParams func(*httprouter.Params, *Summoner) ([]byte, error)
-
-func add_headers(req *http.Request) {
-    req.Header.Add("X-Riot-Token", config.Api.Token)
+type RiotRequest struct {
+    Type string
+    Uri  string
+    Params map[string]string
 }
 
-// TODO: Maybe move these over to another thing
-// Not sure if this is the best practice
-var Client = &http.Client{
-//    CheckRedirect: redirectPolicyFunc,
-}
-
-func BuildUrls(router *httprouter.Router) {
-    // Bread and butter of the package
-    mastery_init(router)
-    summoner_init(router)
-    champion_init(router)
-    ranked_init(router)
-    talent_init(router)
-}
-
-func GetData(http_method string, uri string) ([]byte, error) {
-    var err error
-
-    url := fmt.Sprintf("%s%s", Url, uri)
-
-    req, _ := http.NewRequest("GET", url, nil)
-    add_headers(req)
-    resp, _ := Client.Do(req)
-
-    defer resp.Body.Close()
-    body, _ := ioutil.ReadAll(resp.Body)
-
-    return body, err
-}
-
-func noParams(fn apiNoParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request,  _ httprouter.Params) {
-        body, err := fn()
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
-
-        w.Write(body)
+func (rr RiotRequest) GetData() ([]byte) {
+    values := url.Values{}
+    for k, v := range rr.Params {
+        values.Add(k, v)
     }
-}
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     "na1.api.riotgames.com",
+		Path:     fmt.Sprintf("lol/%s/%s/%s", rr.Type, c.Version, rr.Uri),
+		RawQuery: values.Encode(),
+	}
 
-func hasParams(fn apiParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-        body, err := fn(&ps)
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
+    fmt.Println("%s -- %s", rr.Type, u)
 
-        w.Write(body)
-    }
-}
+    req, _ := http.NewRequest("GET", u.String(), nil)
+    req.Header.Add("X-Riot-Token", c.Api.Token)
+    res, _ := Client.Do(req)
 
-func paramsWithSummoner(fn summonerParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-        summoner := getSummoner(ps.ByName("summoner_name"))
-        body, err := fn(&ps, &summoner)
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
+    defer res.Body.Close()
+    body, _ := ioutil.ReadAll(res.Body)
+    fmt.Printf("%s\n", body)
 
-        w.Write(body)
-    }
+    return body
 }
