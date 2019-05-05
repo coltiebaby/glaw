@@ -1,34 +1,32 @@
 package config
 
 import (
-    "io/ioutil"
-    "log"
-    "gopkg.in/yaml.v2"
-    "path/filepath"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
+	"path/filepath"
 )
 
 type Config struct {
-    Api struct {
-        Token string `yaml:"token"`
-    }
-    Version string `yaml:"version"`
+	Api struct {
+		Token string `yaml:"token"`
+	}
+	Version string `yaml:"version"`
 }
 
-func GetConfig() (Config) {
-    config_path, err := filepath.Abs("config/config.yml")
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
+func GetConfig() Config {
+	config_path, err := filepath.Abs("config/config.yml")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-    // var file_contents
+	file_contents, _ := ioutil.ReadFile(config_path)
+	config := Config{}
 
-    file_contents, _ := ioutil.ReadFile(config_path)
-    config := Config{}
+	err = yaml.Unmarshal(file_contents, &config)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
 
-    err = yaml.Unmarshal(file_contents, &config)
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
-
-    return config
+	return config
 }
