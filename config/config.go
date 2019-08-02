@@ -1,46 +1,33 @@
 package config
 
 import (
-	"io/ioutil"
+	"fmt"
 	"os"
-	"path/filepath"
-
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
-)
-
-const (
-	key string = "GLAW_CONFIG"
 )
 
 type Config struct {
-	Api struct {
-		Token string `yaml:"token"`
-	}
-	Version  string `yaml:"version"`
-	LogLevel bool   `yaml:"log-level"`
+	Token string `yaml:"api.token"`
 }
 
-func GetConfig() Config {
-	fp := os.Getenv(key)
-	log.Println("Getting fp:", fp)
-	config_path, err := filepath.Abs(fp)
-	if err != nil {
-		log.fatal(err)
-	}
-
-	file_contents, _ := ioutil.ReadFile(config_path)
-	config := Config{}
-
-	err = yaml.Unmarshal(file_contents, &config)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-
-	lvl, err := log.ParseLevel(config.LogLevel)
-	if err != nil {
-		log.fatal(err)
-	}
-	log.SetLevel(lvl)
-	return config
+func NewConfig() *Config {
+	return &Config{}
 }
+
+// Fetches the config info from the environ.
+// Returns an error if the token is not set.
+func (c *Config) FromEnv() error {
+	var ok bool
+	if c.Token, ok = os.LookupEnv(TOKEN_ENV); !ok {
+		return TokenNotSetErr
+	}
+
+	return nil
+}
+
+const (
+    // Name of the environ we want to get
+	TOKEN_ENV = "RIOT_API_TOKEN"
+)
+
+// General Error passed back if the token is not set
+var TokenNotSetErr error = fmt.Errorf("%s is not set!", TOKEN_ENV)
