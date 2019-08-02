@@ -1,6 +1,7 @@
 package riot
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -11,11 +12,17 @@ import (
 
 var (
 	Client = &http.Client{}
-	c      = config.GetConfig()
+	// TODO: Replace
+	c = func() *config.Config {
+		x := config.NewConfig()
+		x.FromEnv()
+		return x
+
+	}()
 )
 
 func logResponse(code int, url string) {
-	respLog := log.WithFields(log.Fields{name: "riot", "url": url, "status": code})
+	respLog := log.WithFields(log.Fields{"name": "riot", "url": url, "status": code})
 	switch code {
 	case 200, 201:
 		respLog.Debug()
@@ -35,7 +42,23 @@ type RiotRequest struct {
 	Params  map[string]string
 }
 
-func (rr RiotRequest) GetData() (*http.Response, error) {
+func get(u *url.URL) (resp *http.Response, err error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return resp, err
+	}
+
+	req.Header.Add("X-Riot-Token", c.Token)
+	resp, err = Client.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	logResponse(resp.StatusCode, u.String())
+	return resp, nil
+}
+
+func (rr RiotRequest) Get(v interface{}) (err error) {
 	values := url.Values{}
 	for k, v := range rr.Params {
 		values.Add(k, v)
@@ -48,20 +71,11 @@ func (rr RiotRequest) GetData() (*http.Response, error) {
 		RawQuery: values.Encode(),
 	}
 
-	req, err := http.NewRequest("GET", u.String(), nil)
+	resp, err := get(u)
 	if err != nil {
-		RiotLog.Fatal(err)
-		return &http.Response{}, err
+		return err
 	}
 
-	req.Header.Add("X-Riot-Token", c.Api.Token)
-	resp, err := Client.Do(req)
-	if err != nil {
-		RiotLog.Fatal(err)
-		return &http.Response{}, err
-	}
-
-	logResponse(resp.StatusCode, u.String())
-
-	return resp, nil
+	err = json.NewDecoder(resp.Body).Decode(v)
+	return err
 }
