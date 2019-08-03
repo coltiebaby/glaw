@@ -39,7 +39,7 @@ type RiotRequest struct {
 	Type    string
 	Uri     string
 	Version string
-	Params  map[string]string
+	Params  url.Values
 }
 
 func get(u *url.URL) (resp *http.Response, err error) {
@@ -58,17 +58,16 @@ func get(u *url.URL) (resp *http.Response, err error) {
 	return resp, nil
 }
 
-func (rr RiotRequest) Get(v interface{}) (err error) {
-	values := url.Values{}
-	for k, v := range rr.Params {
-		values.Add(k, v)
-	}
+func (rr *RiotRequest) AddParameter(key, value string) {
+	rr.Params.Add(key, value)
+}
 
+func (rr RiotRequest) Get(v interface{}) (err error) {
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     "na1.api.riotgames.com",
 		Path:     fmt.Sprintf("lol/%s/%s/%s", rr.Type, rr.Version, rr.Uri),
-		RawQuery: values.Encode(),
+		RawQuery: rr.Params.Encode(),
 	}
 
 	resp, err := get(u)
