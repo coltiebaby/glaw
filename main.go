@@ -1,18 +1,14 @@
 package main
 
 import (
-    "log"
-    "net/http"
+	"context"
+	"fmt"
 
-    "github.com/julienschmidt/httprouter"
-
-    "vs/riot"
+	"github.com/coltiebaby/g-law/riot/v4/matches"
 )
 
 func main() {
-    router := httprouter.New()
-    riot.BuildUrls(router)
-
-    log.Println("Listening...")
-    http.ListenAndServe(":3000", router)
+	ctx := context.Background()
+	m, _ := matches.GetTimeline(ctx, "3035593313")
+	fmt.Println(m)
 }

@@ -1,34 +1,56 @@
 package config
 
 import (
-    "io/ioutil"
-    "log"
-    "gopkg.in/yaml.v2"
-    "path/filepath"
+	"context"
+	"fmt"
+	"os"
 )
 
 type Config struct {
-    Api struct {
-        Token string `yaml:"token"`
-    }
-    Version string `yaml:"version"`
+	Token string `yaml:"api.token"`
 }
 
-func GetConfig() (Config) {
-    config_path, err := filepath.Abs("config/config.yml")
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
-
-    // var file_contents
-
-    file_contents, _ := ioutil.ReadFile(config_path)
-    config := Config{}
-
-    err = yaml.Unmarshal(file_contents, &config)
-    if err != nil {
-        log.Fatalf("error: %v", err)
-    }
-
-    return config
+func NewConfig() *Config {
+	return &Config{}
 }
+
+// Fetches the config info from the environ.
+// Returns an error if the token is not set.
+func (c *Config) FromEnv() error {
+	var ok bool
+	if c.Token, ok = os.LookupEnv(TOKEN_ENV); !ok {
+		return TokenNotSetErr
+	}
+
+	return nil
+}
+
+func CtxGetToken(ctx context.Context) (token string, err error) {
+	if t := ctx.Value(ctxKey); t != nil {
+		token = t.(string)
+	} else {
+		err = TokenNotSetErr
+	}
+
+	return token, err
+}
+
+func CtxSetToken(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, ctxKey, token)
+}
+
+const (
+	// Name of the environ we want to get
+	TOKEN_ENV = "RIOT_API_TOKEN"
+)
+
+type confKey string
+
+var (
+	ctxKey confKey = confKey("token")
+)
+
+// Errors
+var (
+	TokenNotSetErr error = fmt.Errorf("%s is not set!", TOKEN_ENV)
+)

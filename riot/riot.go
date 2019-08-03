@@ -1,88 +1,81 @@
 package riot
 
 import (
-    "fmt"
-    "io/ioutil"
-    "log"
-    "net/http"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
 
-    "github.com/julienschmidt/httprouter"
+	"github.com/coltiebaby/g-law/config"
+	log "github.com/sirupsen/logrus"
 )
-import c "vs/config"
 
-const Url = "https://na1.api.riotgames.com/lol"
+var (
+	Client = &http.Client{}
+	// TODO: Replace
+	c = func() *config.Config {
+		x := config.NewConfig()
+		x.FromEnv()
+		return x
 
-var config = c.GetConfig()
-var Version = config.Version
+	}()
+)
 
-type apiNoParams func() ([]byte, error)
-type apiParams func(*httprouter.Params) ([]byte, error)
-type summonerParams func(*httprouter.Params, *Summoner) ([]byte, error)
-
-func add_headers(req *http.Request) {
-    req.Header.Add("X-Riot-Token", config.Api.Token)
+func logResponse(code int, url string) {
+	respLog := log.WithFields(log.Fields{"name": "riot", "url": url, "status": code})
+	switch code {
+	case 200, 201:
+		respLog.Debug()
+	case 404:
+		respLog.Warning("Not Found!")
+	case 401:
+		respLog.Fatal("API Token is down for the count...")
+	default:
+		respLog.Warning()
+	}
 }
 
-// TODO: Maybe move these over to another thing
-// Not sure if this is the best practice
-var Client = &http.Client{
-//    CheckRedirect: redirectPolicyFunc,
+type RiotRequest struct {
+	Type    string
+	Uri     string
+	Version string
+	Params  map[string]string
 }
 
-func BuildUrls(router *httprouter.Router) {
-    // Bread and butter of the package
-    mastery_init(router)
-    summoner_init(router)
-    champion_init(router)
-    ranked_init(router)
-    talent_init(router)
+func get(u *url.URL) (resp *http.Response, err error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return resp, err
+	}
+
+	req.Header.Add("X-Riot-Token", c.Token)
+	resp, err = Client.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	logResponse(resp.StatusCode, u.String())
+	return resp, nil
 }
 
-func GetData(http_method string, uri string) ([]byte, error) {
-    var err error
+func (rr RiotRequest) Get(v interface{}) (err error) {
+	values := url.Values{}
+	for k, v := range rr.Params {
+		values.Add(k, v)
+	}
 
-    url := fmt.Sprintf("%s%s", Url, uri)
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     "na1.api.riotgames.com",
+		Path:     fmt.Sprintf("lol/%s/%s/%s", rr.Type, rr.Version, rr.Uri),
+		RawQuery: values.Encode(),
+	}
 
-    req, _ := http.NewRequest("GET", url, nil)
-    add_headers(req)
-    resp, _ := Client.Do(req)
+	resp, err := get(u)
+	if err != nil {
+		return err
+	}
 
-    defer resp.Body.Close()
-    body, _ := ioutil.ReadAll(resp.Body)
-
-    return body, err
-}
-
-func noParams(fn apiNoParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request,  _ httprouter.Params) {
-        body, err := fn()
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
-
-        w.Write(body)
-    }
-}
-
-func hasParams(fn apiParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-        body, err := fn(&ps)
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
-
-        w.Write(body)
-    }
-}
-
-func paramsWithSummoner(fn summonerParams) (httprouter.Handle) {
-    return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-        summoner := getSummoner(ps.ByName("summoner_name"))
-        body, err := fn(&ps, &summoner)
-        if err != nil {
-            log.Fatalf("DefaultOutputHandler found an err: %v", err)
-        }
-
-        w.Write(body)
-    }
+	err = json.NewDecoder(resp.Body).Decode(v)
+	return err
 }
