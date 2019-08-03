@@ -1,56 +1,53 @@
-package match
+package matches
 
 type ParticipantID struct {
-    ParticipantID int `json:"participantId"`
-    Player struct {
-        CurrentPlatformID string `json:"currentPlatformId"`
-        SummonerName      string `json:"summonerName"`
-        MatchHistoryURI   string `json:"matchHistoryUri"`
-        PlatformID        string `json:"platformId"`
-        CurrentAccountID  string `json:"currentAccountId"`
-        ProfileIcon       int    `json:"profileIcon"`
-        SummonerID        string `json:"summonerId"`
-        AccountID         string `json:"accountId"`
-    } `json:"player"`
+	ParticipantID int `json:"participantId"`
+	Player        struct {
+		CurrentPlatformID string `json:"currentPlatformId"`
+		SummonerName      string `json:"summonerName"`
+		MatchHistoryURI   string `json:"matchHistoryUri"`
+		PlatformID        string `json:"platformId"`
+		CurrentAccountID  string `json:"currentAccountId"`
+		ProfileIcon       int    `json:"profileIcon"`
+		SummonerID        string `json:"summonerId"`
+		AccountID         string `json:"accountId"`
+	} `json:"player"`
 }
 
 type Team struct {
-    FirstDragon bool `json:"firstDragon"`
-    Bans        []struct {
-        PickTurn   int `json:"pickTurn"`
-        ChampionID int `json:"championId"`
-    } `json:"bans"`
-    FirstInhibitor       bool   `json:"firstInhibitor"`
-    Win                  string `json:"win"`
-    FirstRiftHerald      bool   `json:"firstRiftHerald"`
-    FirstBaron           bool   `json:"firstBaron"`
-    BaronKills           int    `json:"baronKills"`
-    RiftHeraldKills      int    `json:"riftHeraldKills"`
-    FirstBlood           bool   `json:"firstBlood"`
-    TeamID               int    `json:"teamId"`
-    FirstTower           bool   `json:"firstTower"`
-    VilemawKills         int    `json:"vilemawKills"`
-    InhibitorKills       int    `json:"inhibitorKills"`
-    TowerKills           int    `json:"towerKills"`
-    DominionVictoryScore int    `json:"dominionVictoryScore"`
-    DragonKills          int    `json:"dragonKills"`
+	FirstDragon bool `json:"firstDragon"`
+	Bans        []struct {
+		PickTurn   int `json:"pickTurn"`
+		ChampionID int `json:"championId"`
+	} `json:"bans"`
+	FirstInhibitor       bool   `json:"firstInhibitor"`
+	Win                  string `json:"win"`
+	FirstRiftHerald      bool   `json:"firstRiftHerald"`
+	FirstBaron           bool   `json:"firstBaron"`
+	BaronKills           int    `json:"baronKills"`
+	RiftHeraldKills      int    `json:"riftHeraldKills"`
+	FirstBlood           bool   `json:"firstBlood"`
+	TeamID               int    `json:"teamId"`
+	FirstTower           bool   `json:"firstTower"`
+	VilemawKills         int    `json:"vilemawKills"`
+	InhibitorKills       int    `json:"inhibitorKills"`
+	TowerKills           int    `json:"towerKills"`
+	DominionVictoryScore int    `json:"dominionVictoryScore"`
+	DragonKills          int    `json:"dragonKills"`
 }
 
-:q
-
-
 type Match struct {
-	SeasonID              int   `json:"seasonId"`
-	QueueID               int   `json:"queueId"`
-	GameID                int64 `json:"gameId"`
+	SeasonID       int             `json:"seasonId"`
+	QueueID        int             `json:"queueId"`
+	GameID         int64           `json:"gameId"`
 	ParticipantIDs []ParticipantID `json:"participantIdentities"`
-	GameVersion string `json:"gameVersion"`
-	PlatformID  string `json:"platformId"`
-	GameMode    string `json:"gameMode"`
-	MapID       int    `json:"mapId"`
-	GameType    string `json:"gameType"`
-	Teams       []Team `json:"teams"`
-	Participants []struct {
+	GameVersion    string          `json:"gameVersion"`
+	PlatformID     string          `json:"platformId"`
+	GameMode       string          `json:"gameMode"`
+	MapID          int             `json:"mapId"`
+	GameType       string          `json:"gameType"`
+	Teams          []Team          `json:"teams"`
+	Participants   []struct {
 		Stats struct {
 			NeutralMinionsKilledTeamJungle  int  `json:"neutralMinionsKilledTeamJungle"`
 			VisionScore                     int  `json:"visionScore"`
@@ -199,4 +196,23 @@ type Match struct {
 	} `json:"participants"`
 	GameDuration int   `json:"gameDuration"`
 	GameCreation int64 `json:"gameCreation"`
+}
+
+// Used in matchlist/*
+type MatchStorage struct {
+	Matches    []MatchInfo `json:"matches"`
+	EndIndex   int         `json:"endIndex"`
+	StartIndex int         `json:"startIndex"`
+	TotalGames int         `json:"totalGames"`
+}
+
+type MatchInfo struct {
+	Lane       string `json:"lane"`
+	GameID     int64  `json:"gameId"`
+	Champion   int    `json:"champion"`
+	PlatformID string `json:"platformId"`
+	Timestamp  int64  `json:"timestamp"`
+	Queue      int    `json:"queue"`
+	Role       string `json:"role"`
+	Season     int    `json:"season"`
 }

@@ -1,19 +1,19 @@
 package matches
 
 import (
-	"context"
-	"encoding/json"
-
-	"github.com/coltiebaby/g-law/riot"
-	"github.com/coltiebaby/g-law/riot/v4"
+//	"context"
+//	"encoding/json"
+//
+//	"github.com/coltiebaby/g-law/riot"
+//	"github.com/coltiebaby/g-law/riot/v4"
 )
 
-type Match struct {
+type Matchx struct {
 	Frames []Frame `json:frames`
 }
 
 // Get only the events you want.
-func (m *Match) Filter(by ...string) {
+func (m *Matchx) Filter(by ...string) {
 	for i, frame := range m.Frames {
 		events := filter(frame.Events, by)
 		frame.Events = events
@@ -33,6 +33,7 @@ type Event struct {
 	Type      string `json:"type"`
 }
 
+/*
 func GetTimeline(ctx context.Context, match_id string) (*Match, error) {
 	match := &Match{}
 
@@ -42,7 +43,7 @@ func GetTimeline(ctx context.Context, match_id string) (*Match, error) {
 		Version: v4.VERSION,
 	}
 
-	resp, _ := req.GetData()
+	resp, _ := req.Get()
 	err := json.NewDecoder(resp.Body).Decode(match)
 	if err != nil {
 		return match, err
@@ -50,3 +51,4 @@ func GetTimeline(ctx context.Context, match_id string) (*Match, error) {
 
 	return match, nil
 }
+*/
