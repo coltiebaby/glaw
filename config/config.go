@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	Token string `yaml:"api.token"`
+	Token string
 }
 
 func NewConfig() *Config {

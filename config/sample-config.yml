@@ -1,4 +1,0 @@
-api:
-  token: <token>
-version: v3
-log-level: info
