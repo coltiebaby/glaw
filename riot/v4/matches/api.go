@@ -21,3 +21,16 @@ func GetMatchlists(id string, values url.Values) (matches MatchStorage, err erro
 	req.Get(&matches)
 	return matches, err
 }
+
+func GetTimeline(match_id string) (tl Timeline, err error) {
+	tl = Timeline{}
+
+	req := riot.RiotRequest{
+		Type:    "match",
+		Uri:     "timelines/by-match/" + match_id,
+		Version: v4.VERSION,
+	}
+
+	err = req.Get(&tl)
+	return tl, err
+}

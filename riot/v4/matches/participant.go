@@ -8,17 +8,17 @@ type Delta struct {
 type ParticipantTimeline struct {
 	Lane                    string `json:"lane"`
 	ParticipantID           int    `json:"participantId"`
+	Role                    string `json:"role"`
 	GoldPerMinDeltas        Delta  `json:"goldPerMinDeltas"`
 	CreepsPerMinDeltas      Delta  `json:"creepsPerMinDeltas"`
 	XpPerMinDeltas          Delta  `json:"xpPerMinDeltas"`
-	Role                    string `json:"role"`
 	DamageTakenPerMinDeltas Delta  `json:"damageTakenPerMinDeltas"`
 }
 
 type Participant struct {
+	Timeline                  ParticipantTimeline `json:"timeline"`
 	Spell1ID                  int                 `json:"spell1Id"`
 	ParticipantID             int                 `json:"participantId"`
-	Timeline                  ParticipantTimeline `json:"timeline"`
 	Spell2ID                  int                 `json:"spell2Id"`
 	TeamID                    int                 `json:"teamId"`
 	Stats                     Stat                `json:"stats"`
