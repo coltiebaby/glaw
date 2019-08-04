@@ -7,7 +7,6 @@ import (
 	"net/url"
 
 	"github.com/coltiebaby/g-law/config"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -20,20 +19,6 @@ var (
 
 	}()
 )
-
-func logResponse(code int, url string) {
-	respLog := log.WithFields(log.Fields{"name": "riot", "url": url, "status": code})
-	switch code {
-	case 200, 201:
-		respLog.Debug()
-	case 404:
-		respLog.Warning("Not Found!")
-	case 401:
-		respLog.Fatal("API Token is down for the count...")
-	default:
-		respLog.Warning()
-	}
-}
 
 type RiotRequest struct {
 	Type    string
@@ -54,7 +39,6 @@ func get(u *url.URL) (resp *http.Response, err error) {
 		return resp, err
 	}
 
-	logResponse(resp.StatusCode, u.String())
 	return resp, nil
 }
 
@@ -62,7 +46,7 @@ func (rr *RiotRequest) AddParameter(key, value string) {
 	rr.Params.Add(key, value)
 }
 
-func (rr RiotRequest) Get(v interface{}) (err error) {
+func (rr RiotRequest) Get(v interface{}) *RequestError {
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     "na1.api.riotgames.com",
@@ -72,9 +56,16 @@ func (rr RiotRequest) Get(v interface{}) (err error) {
 
 	resp, err := get(u)
 	if err != nil {
-		return err
+		return NewErrorFromString(err.Error())
 	}
 
-	err = json.NewDecoder(resp.Body).Decode(v)
-	return err
+	if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
+		return NewErrorFromString(err.Error())
+	}
+
+	if isBad(resp.StatusCode) {
+		err = NewRequestError(resp)
+	}
+
+	return nil
 }
