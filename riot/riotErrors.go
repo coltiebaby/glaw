@@ -9,6 +9,10 @@ import (
 	"io/ioutil"
 )
 
+func isBad(code int) bool {
+	return (code >= 200 && code < 300) != true
+}
+
 type RequestError struct {
 	Message     string
 	RiotMessage string
@@ -16,14 +20,8 @@ type RequestError struct {
 	Wait        int
 }
 
-func (re *RequestError) Error() string {
-	builder := &strings.Builder{}
-	json.NewEncoder(builder).Encode(re)
-	return builder.String()
-}
-
-func (re *RequestError) String() string {
-	return re.Error()
+func NewErrorFromString(msg string) *RequestError {
+	return &RequestError{Message: msg}
 }
 
 func NewRequestError(resp *http.Response) *RequestError {
@@ -47,6 +45,16 @@ func NewRequestError(resp *http.Response) *RequestError {
 		Wait:        retry,
 	}
 
+}
+
+func (re *RequestError) Error() string {
+	builder := &strings.Builder{}
+	json.NewEncoder(builder).Encode(re)
+	return builder.String()
+}
+
+func (re *RequestError) String() string {
+	return re.Error()
 }
 
 func getMessage(code int) string {
