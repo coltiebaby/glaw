@@ -7,28 +7,28 @@ import (
 
 var buildUri = v4.BuildUriFunc(`summoner`)
 
-func get(endpoint string) (summoner Summoner, err error) {
-	req := riot.Client.NewRequest(buildUri(endpoint))
+func get(c riot.ApiClient, endpoint string) (summoner Summoner, err error) {
+	req := c.NewRequest(buildUri(endpoint))
 	req.Get(&summoner)
 	return summoner, err
 }
 
-func ByName(name string) (summoner Summoner, err error) {
-	summoner, err = get("summoners/by-name/" + name)
+func ByName(c riot.ApiClient, name string) (summoner Summoner, err error) {
+	summoner, err = get(c, "summoners/by-name/"+name)
 	return summoner, err
 }
 
-func ByAccountID(id string) (summoner Summoner, err error) {
-	summoner, err = get("summoners/by-account/" + id)
+func ByAccountID(c riot.ApiClient, id string) (summoner Summoner, err error) {
+	summoner, err = get(c, "summoners/by-account/"+id)
 	return summoner, err
 }
 
-func ByPUUID(puuid string) (summoner Summoner, err error) {
-	summoner, err = get("summoners/by-puuid/" + puuid)
+func ByPUUID(c riot.ApiClient, puuid string) (summoner Summoner, err error) {
+	summoner, err = get(c, "summoners/by-puuid/"+puuid)
 	return summoner, err
 }
 
-func ByID(id string) (summoner Summoner, err error) {
-	summoner, err = get("summoners/" + id)
+func ByID(c riot.ApiClient, id string) (summoner Summoner, err error) {
+	summoner, err = get(c, "summoners/"+id)
 	return summoner, err
 }

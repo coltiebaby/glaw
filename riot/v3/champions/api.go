@@ -5,10 +5,10 @@ import (
 	"github.com/coltiebaby/g-law/riot/v3"
 )
 
-var buildUri = BuildUriFunc(`platform`)
+var buildUri = v3.BuildUriFunc(`platform`)
 
-func FreeChampions() (ci ChampionInfo, err error) {
-	req := riot.Client.NewRequest(buildUri(`champion-rotations`))
+func FreeChampions(c riot.ApiClient) (ci ChampionInfo, err error) {
+	req := c.NewRequest(buildUri(`champion-rotations`))
 
 	req.Get(&ci)
 	return ci, err

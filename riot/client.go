@@ -1,5 +1,14 @@
 package riot
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/url"
+
+	"github.com/coltiebaby/g-law/ratelimit"
+	"github.com/coltiebaby/g-law/riot/errors"
+)
+
 type RiotClient struct {
 	rateLimitEnabled bool
 	limiter          *ratelimit.RateLimit
