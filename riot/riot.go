@@ -16,18 +16,17 @@ var (
 	Client = NewClient(c.EnableRateLimiting)
 )
 
+type ApiClient interface {
+	NewRequest(string) ApiRequest
+}
+
 type ApiRequest interface {
-	Get(v interface{}) *errors.RequestError
-	AddParameter(key, value string)
+	Get(interface{}) *errors.RequestError
+	AddParameter(string, string)
 	SetParameters(url.Values)
 }
 
-type RiotClient struct {
-	rateLimitEnabled bool
-	limiter          *ratelimit.RateLimit
-}
-
-func NewClient(enabled bool) *RiotClient {
+func NewClient(enabled bool) ApiClient {
 	var limiter *ratelimit.RateLimit
 	if enabled {
 		limiter = ratelimit.Start()
@@ -37,23 +36,6 @@ func NewClient(enabled bool) *RiotClient {
 		rateLimitEnabled: enabled,
 		limiter:          limiter,
 	}
-}
-
-func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
-	req = &RiotRequest{
-		uri: uri,
-	}
-
-	if rc.rateLimitEnabled {
-		rc.limiter.Request()
-	}
-
-	return req
-}
-
-type RiotRequest struct {
-	uri    string
-	params url.Values
 }
 
 func isBad(code int) bool {
@@ -73,36 +55,4 @@ func get(u *url.URL) (resp *http.Response, err error) {
 	}
 
 	return resp, nil
-}
-
-func (rr *RiotRequest) AddParameter(key, value string) {
-	rr.params.Add(key, value)
-}
-
-func (rr *RiotRequest) SetParameters(params url.Values) {
-	rr.params = params
-}
-
-func (rr RiotRequest) Get(v interface{}) *errors.RequestError {
-	u := &url.URL{
-		Scheme:   "https",
-		Host:     "na1.api.riotgames.com",
-		Path:     fmt.Sprintf("lol/%s", rr.uri),
-		RawQuery: rr.params.Encode(),
-	}
-
-	resp, err := get(u)
-	if err != nil {
-		return errors.NewErrorFromString(err.Error())
-	}
-
-	if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return errors.NewErrorFromString(err.Error())
-	}
-
-	if isBad(resp.StatusCode) {
-		err = errors.NewRequestError(resp)
-	}
-
-	return nil
 }
