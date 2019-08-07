@@ -22,7 +22,7 @@ const (
 	REGION_PBE
 )
 
-var Regions map[Region]string = map[Region]string{
+var Regions = map[Region]string{
 	REGION_NA:   `NA`,
 	REGION_BR:   `BR`,
 	REGION_EUNE: `EUNE`,
@@ -37,7 +37,7 @@ var Regions map[Region]string = map[Region]string{
 	REGION_PBE:  `PBE`,
 }
 
-var RegionsPlatform map[Region]string = map[Region]string{
+var RegionsPlatform = map[Region]string{
 	REGION_NA:   `NA1`,
 	REGION_BR:   `BR1`,
 	REGION_EUNE: `EUN1`,
