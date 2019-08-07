@@ -1,7 +1,6 @@
 package ratelimit
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -11,15 +10,6 @@ type RateLimit struct {
 	limit      int
 	burstLimit int
 	gauge      chan time.Time
-}
-
-func increase(rl *RateLimit) {
-	ticker := time.NewTicker(rl.Rate())
-	defer ticker.Stop()
-
-	for {
-		rl.Increase(<-ticker.C)
-	}
 }
 
 func NewLimit(limit, burstLimit, reset int) *RateLimit {
@@ -34,7 +24,6 @@ func NewLimit(limit, burstLimit, reset int) *RateLimit {
 }
 
 func (rl *RateLimit) Increase(t time.Time) {
-	fmt.Println("increasin")
 	if rl.Len() < rl.Max() {
 		rl.gauge <- t
 	}
@@ -68,6 +57,16 @@ func (rl *RateLimit) Request() bool {
 
 func Start() *RateLimit {
 	rl := NewLimit(100, 20, 120)
-	go increase(rl)
+
+	// Fills the channel at a fixed rate to replace all requests made
+	go func() {
+		ticker := time.NewTicker(rl.Rate())
+		defer ticker.Stop()
+
+		for {
+			rl.Increase(<-ticker.C)
+		}
+	}()
+
 	return rl
 }

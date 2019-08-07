@@ -7,11 +7,15 @@ import (
 )
 
 type Config struct {
-	Token string
+	Token              string
+	EnableRateLimiting bool
 }
 
 func NewConfig(token string) *Config {
-	return &Config{Token: token}
+	return &Config{
+		Token:              token,
+		EnableRateLimiting: true,
+	}
 }
 
 // Fetches the config info from the environ.

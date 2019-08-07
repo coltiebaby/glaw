@@ -5,13 +5,10 @@ import (
 	"github.com/coltiebaby/g-law/riot/v4"
 )
 
-func get(uri string) (summoner Summoner, err error) {
-	req := riot.RiotRequest{
-		Type:    `summoner`,
-		Uri:     uri,
-		Version: v4.VERSION,
-	}
+var buildUri = v4.BuildUriFunc(`summoner`)
 
+func get(endpoint string) (summoner Summoner, err error) {
+	req := riot.Client.NewRequest(buildUri(endpoint))
 	req.Get(&summoner)
 	return summoner, err
 }

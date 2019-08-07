@@ -8,28 +8,19 @@ import (
 	"github.com/coltiebaby/g-law/riot/v4"
 )
 
-func getLeague(uri string) (league League, err error) {
-	req := riot.RiotRequest{
-		Type:    `league`,
-		Uri:     uri,
-		Version: v4.VERSION,
-	}
+var buildUri = v4.BuildUriFunc(`league`)
+
+func getLeague(endpoint string) (league League, err error) {
+	req := riot.Client.NewRequest(buildUri(endpoint))
 
 	req.Get(&league)
 	return league, err
 }
 
-func getEntries(uri string, page int) (entries []LeagueEntry, err error) {
-	var params map[string]string = make(map[string]string)
+func getEntries(endpoint string, page int) (entries []LeagueEntry, err error) {
+	req := riot.Client.NewRequest(buildUri(endpoint))
 	if page > 0 {
-		params[`page`] = strconv.Itoa(page)
-	}
-
-	req := riot.RiotRequest{
-		Type:    `league`,
-		Uri:     uri,
-		Version: v4.VERSION,
-		Params:  params,
+		req.AddParamter(`page`, strconv.Itoa(page))
 	}
 
 	err = req.Get(&entries)
