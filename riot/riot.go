@@ -11,7 +11,7 @@ import (
 
 var (
 	c      = config.FromEnv()
-	Client = NewClient(c.EnableRateLimiting)
+	Client = NewClient(REGION_NA, c.EnableRateLimiting)
 )
 
 type ApiClient interface {
@@ -24,7 +24,7 @@ type ApiRequest interface {
 	SetParameters(url.Values)
 }
 
-func NewClient(enabled bool) ApiClient {
+func NewClient(region Region, enabled bool) ApiClient {
 	var limiter *ratelimit.RateLimit
 	if enabled {
 		limiter = ratelimit.Start()
@@ -33,6 +33,7 @@ func NewClient(enabled bool) ApiClient {
 	return &RiotClient{
 		rateLimitEnabled: enabled,
 		limiter:          limiter,
+		region:           region,
 	}
 }
 
