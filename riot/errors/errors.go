@@ -1,4 +1,4 @@
-package riot
+package errors
 
 import (
 	"encoding/json"
@@ -8,10 +8,6 @@ import (
 
 	"io/ioutil"
 )
-
-func isBad(code int) bool {
-	return (code >= 200 && code < 300) != true
-}
 
 type RequestError struct {
 	Message     string
