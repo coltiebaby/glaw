@@ -13,18 +13,19 @@ to run your stuff.
 package main
 
 import (
-  "fmt"
+	"fmt"
 
-  "github.com/coltiebaby/g-law/riot/v4/summoner"
-  "github.com/coltiebaby/g-law/riot/v4/matches"
+	"github.com/coltiebaby/g-law/riot"
+	"github.com/coltiebaby/g-law/riot/v4/summoner"
 )
 
 func main() {
-  summoner, err := summoner.ByName(`Oscillation`)
-  fmt.Printf("Current Summoner: %s -- Level: %d", summoner.Name, summoner.SummonerLevel)
+	summoner, err := summoner.ByName(riot.Client, `Oscillation`)
+	if err != nil {
+		fmt.Println("Got an err:", err)
+		return
+	}
 
-  match, err := matches.GetMatch(summoner.AccountID)
-  // Do stuff with match...
+	fmt.Printf("Current Summoner: %s -- Level: %d\n", summoner.Name, summoner.SummonerLevel)
 }
-
 ```

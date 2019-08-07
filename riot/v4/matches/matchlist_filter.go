@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/coltiebaby/g-law/riot"
 )
 
 // Match Filter will help you sort through match history.
@@ -13,6 +15,8 @@ import (
 //
 // url: https://developer.riotgames.com/game-constants.html
 type MatchFilter struct {
+	Client riot.ApiClient
+
 	AccountID string
 	Start     time.Time
 	End       time.Time
@@ -39,8 +43,8 @@ func getIndex(max, page int) (begin int, end int) {
 	return begin, end
 }
 
-func NewMatchFilter(start, end time.Time) (filter *MatchFilter) {
-	filter = &MatchFilter{}
+func NewMatchFilter(c riot.ApiClient, start, end time.Time) (filter *MatchFilter) {
+	filter = &MatchFilter{Client: c}
 
 	filter.Start = start
 	filter.End = end
@@ -48,13 +52,6 @@ func NewMatchFilter(start, end time.Time) (filter *MatchFilter) {
 	filter.SetMaxResults(20)
 
 	return filter
-}
-
-func FilterSince(days int) (filter *MatchFilter) {
-	to := time.Now()
-	from := to.AddDate(0, 0, days*-1)
-
-	return NewMatchFilter(from, to)
 }
 
 // Confirm results are between 1 - 100
@@ -87,7 +84,7 @@ func (filter *MatchFilter) Next() (matches MatchStorage, err error) {
 
 	filter.begin, filter.end = begin, end
 
-	matches, err = GetMatchlists(filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -103,7 +100,7 @@ func (filter *MatchFilter) Prev() (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -117,7 +114,7 @@ func (filter *MatchFilter) GoTo(page int) (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }

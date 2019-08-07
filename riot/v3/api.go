@@ -1,5 +1,9 @@
 package v3
 
+import (
+	"fmt"
+)
+
 const (
 	VERSION string = `v3`
 )

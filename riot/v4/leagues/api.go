@@ -10,15 +10,15 @@ import (
 
 var buildUri = v4.BuildUriFunc(`league`)
 
-func getLeague(endpoint string) (league League, err error) {
-	req := riot.Client.NewRequest(buildUri(endpoint))
+func getLeague(c riot.ApiClient, endpoint string) (league League, err error) {
+	req := c.NewRequest(buildUri(endpoint))
 
 	req.Get(&league)
 	return league, err
 }
 
-func getEntries(endpoint string, page int) (entries []LeagueEntry, err error) {
-	req := riot.Client.NewRequest(buildUri(endpoint))
+func getEntries(c riot.ApiClient, endpoint string, page int) (entries []LeagueEntry, err error) {
+	req := c.NewRequest(buildUri(endpoint))
 	if page > 0 {
 		req.AddParamter(`page`, strconv.Itoa(page))
 	}
@@ -27,23 +27,23 @@ func getEntries(endpoint string, page int) (entries []LeagueEntry, err error) {
 	return entries, err
 }
 
-func Challengers(queue Queue) (league League, err error) {
-	league, err = getLeague(fmt.Sprintf(`challengerleagues/by-queue/%s`, queue))
+func Challengers(c riot.ApiClient, queue Queue) (league League, err error) {
+	league, err = getLeague(c, fmt.Sprintf(`challengerleagues/by-queue/%s`, queue))
 	return league, err
 }
 
-func Masters(queue Queue) (league League, err error) {
-	league, err = getLeague(fmt.Sprintf(`masterleagues/by-queue/%s`, queue))
+func Masters(c riot.ApiClient, queue Queue) (league League, err error) {
+	league, err = getLeague(c, fmt.Sprintf(`masterleagues/by-queue/%s`, queue))
 	return league, err
 }
 
-func GrandMasters(queue Queue) (league League, err error) {
-	league, err = getLeague(fmt.Sprintf(`grandmasterleagues/by-queue/%s`, queue))
+func GrandMasters(c riot.ApiClient, queue Queue) (league League, err error) {
+	league, err = getLeague(c, fmt.Sprintf(`grandmasterleagues/by-queue/%s`, queue))
 	return league, err
 }
 
-func GetLeagueByID(leagueID string) (league League, err error) {
-	league, err = getLeague(fmt.Sprintf(`leagues/%s`, queue))
+func GetLeagueByID(c riot.ApiClient, leagueID string) (league League, err error) {
+	league, err = getLeague(c, fmt.Sprintf(`leagues/%s`, leagueID))
 	return league, err
 }
 
@@ -61,19 +61,19 @@ func GetLeagueByID(leagueID string) (league League, err error) {
 //       }
 //       page = page + 1
 //  }
-func EntriesFactory(queue Queue, tier Tier, division Division) func(int) ([]LeagueEntry, error) {
+func EntriesFactory(c riot.ApiClient, queue Queue, tier Tier, division Division) func(int) ([]LeagueEntry, error) {
 	uri := fmt.Sprintf(`entries/%s/%s/%s`, queue, tier, division)
 	return func(page int) ([]LeagueEntry, error) {
-		return Entries(uri, page)
+		return Entries(c, uri, page)
 	}
 }
 
-func Entries(uri string, page int) (entries []LeagueEntry, err error) {
-	entries, err = getEntries(uri, page)
+func Entries(c riot.ApiClient, uri string, page int) (entries []LeagueEntry, err error) {
+	entries, err = getEntries(c, uri, page)
 	return entries, err
 }
 
-func EntriesBySummonerID(id string) (entries []LeagueEntry, err error) {
-	entries, err = getEntries(fmt.Sprintf(`entries/by-summoner/%s`, id), -1)
+func EntriesBySummonerID(c riot.ApiClient, id string) (entries []LeagueEntry, err error) {
+	entries, err = getEntries(c, fmt.Sprintf(`entries/by-summoner/%s`, id), -1)
 	return entries, err
 }
