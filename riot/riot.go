@@ -7,17 +7,15 @@ import (
 	"net/url"
 
 	"github.com/coltiebaby/g-law/config"
+	"github.com/coltiebaby/g-law/ratelimit"
+	"github.com/coltiebaby/g-law/riot/errors"
 )
 
 var (
 	Client = &http.Client{}
-	// TODO: Replace
-	c = func() *config.Config {
-		x := config.NewConfig()
-		x.FromEnv()
-		return x
 
-	}()
+	c       = config.FromEnv()
+	limiter = ratelimit.Start()
 )
 
 type RiotRequest struct {
@@ -25,6 +23,10 @@ type RiotRequest struct {
 	Uri     string
 	Version string
 	Params  url.Values
+}
+
+func isBad(code int) bool {
+	return (code >= 200 && code < 300) != true
 }
 
 func get(u *url.URL) (resp *http.Response, err error) {
@@ -46,7 +48,7 @@ func (rr *RiotRequest) AddParameter(key, value string) {
 	rr.Params.Add(key, value)
 }
 
-func (rr RiotRequest) Get(v interface{}) *RequestError {
+func (rr RiotRequest) Get(v interface{}) *errors.RequestError {
 	u := &url.URL{
 		Scheme:   "https",
 		Host:     "na1.api.riotgames.com",
@@ -56,15 +58,15 @@ func (rr RiotRequest) Get(v interface{}) *RequestError {
 
 	resp, err := get(u)
 	if err != nil {
-		return NewErrorFromString(err.Error())
+		return errors.NewErrorFromString(err.Error())
 	}
 
 	if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return NewErrorFromString(err.Error())
+		return errors.NewErrorFromString(err.Error())
 	}
 
 	if isBad(resp.StatusCode) {
-		err = NewRequestError(resp)
+		err = errors.NewRequestError(resp)
 	}
 
 	return nil

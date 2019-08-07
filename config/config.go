@@ -10,19 +10,18 @@ type Config struct {
 	Token string
 }
 
-func NewConfig() *Config {
-	return &Config{}
+func NewConfig(token string) *Config {
+	return &Config{Token: token}
 }
 
 // Fetches the config info from the environ.
 // Returns an error if the token is not set.
-func (c *Config) FromEnv() error {
-	var ok bool
-	if c.Token, ok = os.LookupEnv(TOKEN_ENV); !ok {
-		return TokenNotSetErr
+func FromEnv() *Config {
+	if token, ok := os.LookupEnv(TOKEN_ENV); ok {
+		return NewConfig(token)
 	}
 
-	return nil
+	panic(TokenNotSetErr)
 }
 
 func CtxGetToken(ctx context.Context) (token string, err error) {
