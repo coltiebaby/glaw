@@ -34,6 +34,7 @@ func SetupRateLimiter(enabled bool) ratelimit.Limiter {
 
 type ApiClient interface {
 	NewRequest(string) ApiRequest
+	ChangeRegion(Region)
 }
 
 type ApiRequest interface {

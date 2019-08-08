@@ -29,6 +29,10 @@ func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 	return req
 }
 
+func (rc *RiotClient) ChangeRegion(region Region) {
+	rc.region = region
+}
+
 type RiotRequest struct {
 	region Region
 	uri    string
