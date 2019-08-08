@@ -6,16 +6,35 @@ import (
 
 	"github.com/coltiebaby/g-law/config"
 	"github.com/coltiebaby/g-law/ratelimit"
+	"github.com/coltiebaby/g-law/ratelimit/clock"
+	"github.com/coltiebaby/g-law/ratelimit/jar"
 	"github.com/coltiebaby/g-law/riot/errors"
 )
 
 var (
-	c      = config.FromEnv()
+	c = config.FromEnv()
+	// Client = NewClient(REGION_NA, c.EnableRateLimiting)
 	Client = NewClient(REGION_NA, c.EnableRateLimiting)
 )
 
+func SetupRateLimiter(enabled bool) ratelimit.Limiter {
+	limiter := ratelimit.NewRateLimiter(enabled)
+
+	for r, _ := range Regions {
+		c := clock.NewClock(100, 120)
+		j := jar.NewBucket(20)
+
+		rl := ratelimit.NewRateLimit(c, j)
+
+		limiter.Add(int(r), rl)
+	}
+
+	return limiter
+}
+
 type ApiClient interface {
 	NewRequest(string) ApiRequest
+	ChangeRegion(Region)
 }
 
 type ApiRequest interface {
@@ -25,15 +44,15 @@ type ApiRequest interface {
 }
 
 func NewClient(region Region, enabled bool) ApiClient {
-	var limiter *ratelimit.RateLimit
+	var rateLimiter ratelimit.Limiter
 	if enabled {
-		limiter = ratelimit.Start()
+		rateLimiter = SetupRateLimiter(enabled)
 	}
 
 	return &RiotClient{
 		rateLimitEnabled: enabled,
-		limiter:          limiter,
 		region:           region,
+		limiter:          rateLimiter,
 	}
 }
 
