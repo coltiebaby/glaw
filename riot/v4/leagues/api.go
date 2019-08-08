@@ -20,7 +20,7 @@ func getLeague(c riot.ApiClient, endpoint string) (league League, err error) {
 func getEntries(c riot.ApiClient, endpoint string, page int) (entries []LeagueEntry, err error) {
 	req := c.NewRequest(buildUri(endpoint))
 	if page > 0 {
-		req.AddParamter(`page`, strconv.Itoa(page))
+		req.AddParameter(`page`, strconv.Itoa(page))
 	}
 
 	err = req.Get(&entries)

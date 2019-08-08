@@ -13,7 +13,7 @@ import (
 type RiotClient struct {
 	region           Region
 	rateLimitEnabled bool
-	limiter          *ratelimit.RateLimit
+	limiter          ratelimit.Limiter
 }
 
 func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
@@ -23,7 +23,7 @@ func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 	}
 
 	if rc.rateLimitEnabled {
-		rc.limiter.Request()
+		rc.limiter.Take(int(rc.region))
 	}
 
 	return req
