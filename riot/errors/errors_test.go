@@ -24,8 +24,23 @@ func CreateResponse(code int) *http.Response {
 }
 
 func TestRequestErrorMsg(t *testing.T) {
-	re := NewRequestError(CreateResponse(401))
-	if !strings.Contains(re.String(), errMessages[401]) {
+	re := NewRequestError(CreateResponse(501))
+	if !strings.Contains(re.String(), `failed to respond`) {
 		t.Errorf("Did not contain expected message")
 	}
+
+	re = NewRequestError(CreateResponse(700))
+	if !strings.Contains(re.String(), `Server`) {
+		t.Errorf("Did not contain expected message")
+	}
+}
+
+func TestGetMessages(t *testing.T) {
+	for code, msg := range errMessages {
+		re := NewRequestError(CreateResponse(code))
+		if !strings.Contains(re.String(), msg) {
+			t.Errorf("Did not contain expected message")
+		}
+	}
+
 }
