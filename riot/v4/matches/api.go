@@ -16,7 +16,12 @@ func GetMatchlists(c riot.ApiClient, id string, values url.Values) (matches Matc
 	req := c.NewRequest(uri)
 	req.SetParameters(values)
 
-	req.Get(&matches)
+	resp, err := c.Get(req)
+	if err != nil {
+		return matches, err
+	}
+
+	err = riot.GetResultFromResp(resp, &matches)
 	return matches, err
 }
 
@@ -24,7 +29,12 @@ func GetMatch(c riot.ApiClient, match_id string) (match Match, err error) {
 	uri := buildUri("matches/" + match_id)
 	req := c.NewRequest(uri)
 
-	err = req.Get(&match)
+	resp, err := c.Get(req)
+	if err != nil {
+		return match, err
+	}
+
+	err = riot.GetResultFromResp(resp, &match)
 	return match, err
 }
 
@@ -32,6 +42,11 @@ func GetTimeline(c riot.ApiClient, match_id string) (tl Timeline, err error) {
 	uri := buildUri("timelines/by-match/" + match_id)
 	req := c.NewRequest(uri)
 
-	err = req.Get(&tl)
+	resp, err := c.Get(req)
+	if err != nil {
+		return tl, err
+	}
+
+	err = riot.GetResultFromResp(resp, &tl)
 	return tl, err
 }

@@ -2,10 +2,10 @@
 package jar
 
 type Jar interface {
-    // Give something to the jar
+	// Give something to the jar
 	Give()
-    // Take something from the jar
+	// Take something from the jar
 	Take()
-    // Check to see if the jar is full
+	// Check to see if the jar is full
 	Full() bool
 }

@@ -9,24 +9,39 @@ import (
 
 var makeUri = v4.BuildUriFunc(`champion-mastery`)
 
-func All(c riot.ApiClient, id string) (cm []ChampionMastery, err error) {
-	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
-
-	err = req.Get(&cm)
-	return cm, err
-}
-
 func Score(c riot.ApiClient, id string) (score int, err error) {
 	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
 
-	err = req.Get(&score)
+	resp, err := c.Get(req)
+	if err != nil {
+		return score, err
+	}
+
+	err = riot.GetResultFromResp(resp, &score)
 	return score, err
+}
+
+func All(c riot.ApiClient, id string) (cm []ChampionMastery, err error) {
+	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
+
+	resp, err := c.Get(req)
+	if err != nil {
+		return ci, err
+	}
+
+	err = riot.GetResultFromResp(resp, &cm)
+	return cm, err
 }
 
 func ByChampionId(c riot.ApiClient, id string, championId int) (cm ChampionMastery, err error) {
 	endpoint := fmt.Sprintf(`champion-masteries/by-summoner/%s/by-champion/%d`, id, championId)
 	req := c.NewRequest(makeUri(endpoint))
 
-	err = req.Get(&cm)
+	resp, err := c.Get(req)
+	if err != nil {
+		return cm, err
+	}
+
+	err = riot.GetResultFromResp(resp, &cm)
 	return cm, err
 }

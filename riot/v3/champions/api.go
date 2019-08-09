@@ -10,6 +10,11 @@ var buildUri = v3.BuildUriFunc(`platform`)
 func FreeChampions(c riot.ApiClient) (ci ChampionInfo, err error) {
 	req := c.NewRequest(buildUri(`champion-rotations`))
 
-	req.Get(&ci)
+	resp, err := c.Get(req)
+	if err != nil {
+		return ci, err
+	}
+
+	err = riot.GetResultFromResp(resp, &ci)
 	return ci, err
 }

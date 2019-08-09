@@ -3,6 +3,7 @@ package riot
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -16,10 +17,22 @@ type RiotClient struct {
 	limiter          ratelimit.Limiter
 }
 
+func NewRiotClient(region Region, enabled bool) *RiotClient {
+	var rateLimiter ratelimit.Limiter
+	if enabled {
+		rateLimiter = SetupRateLimiter(enabled)
+	}
+
+	return &RiotClient{
+		rateLimitEnabled: enabled,
+		region:           region,
+		limiter:          rateLimiter,
+	}
+}
+
 func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 	req = &RiotRequest{
-		region: rc.region,
-		uri:    uri,
+		uri: uri,
 	}
 
 	if rc.rateLimitEnabled {
@@ -29,14 +42,42 @@ func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 	return req
 }
 
+func (rc *RiotClient) Get(req ApiRequest) (resp *http.Response, err error) {
+	platform := RegionsPlatform[rc.region]
+	host := fmt.Sprintf("%s.api.riotgames.com", strings.ToLower(platform))
+
+	u := &url.URL{
+		Scheme:   "https",
+		Host:     host,
+		Path:     fmt.Sprintf("lol/%s", req.Uri()),
+		RawQuery: req.Encode(),
+	}
+
+	var e error
+	if resp, e = get(u); e != nil {
+		err = errors.NewErrorFromString(e.Error())
+	}
+
+	fmt.Println("Get", err)
+	return resp, err
+
+}
+
 func (rc *RiotClient) ChangeRegion(region Region) {
 	rc.region = region
 }
 
 type RiotRequest struct {
-	region Region
 	uri    string
 	params url.Values
+}
+
+func (rr *RiotRequest) Encode() string {
+	return rr.params.Encode()
+}
+
+func (rr *RiotRequest) Uri() string {
+	return rr.uri
 }
 
 func (rr *RiotRequest) AddParameter(key, value string) {
@@ -47,29 +88,34 @@ func (rr *RiotRequest) SetParameters(params url.Values) {
 	rr.params = params
 }
 
-func (rr RiotRequest) Get(v interface{}) *errors.RequestError {
-	platform := RegionsPlatform[rr.region]
-	host := fmt.Sprintf("%s.api.riotgames.com", strings.ToLower(platform))
-
-	u := &url.URL{
-		Scheme:   "https",
-		Host:     host,
-		Path:     fmt.Sprintf("lol/%s", rr.uri),
-		RawQuery: rr.params.Encode(),
-	}
-
-	resp, err := get(u)
-	if err != nil {
-		return errors.NewErrorFromString(err.Error())
-	}
-
-	if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
-		return errors.NewErrorFromString(err.Error())
+func GetResultFromResp(resp *http.Response, v interface{}) (err error) {
+	if e := json.NewDecoder(resp.Body).Decode(v); e != nil {
+		return errors.NewErrorFromString(e.Error())
 	}
 
 	if isBad(resp.StatusCode) {
 		err = errors.NewRequestError(resp)
 	}
 
-	return nil
+	return err
+}
+
+func isBad(code int) bool {
+	return (code >= 200 && code < 300) != true
+}
+
+func get(u *url.URL) (resp *http.Response, err error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return resp, err
+	}
+
+	req.Header.Add("X-Riot-Token", c.Token)
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return resp, err
+	}
+
+	fmt.Println("get", err)
+	return resp, err
 }
