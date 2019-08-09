@@ -9,7 +9,13 @@ var buildUri = v4.BuildUriFunc(`summoner`)
 
 func get(c riot.ApiClient, endpoint string) (summoner Summoner, err error) {
 	req := c.NewRequest(buildUri(endpoint))
-	req.Get(&summoner)
+
+	resp, err := c.Get(req)
+	if err != nil {
+		return summoner, err
+	}
+
+	err = riot.GetResultFromResp(resp, &summoner)
 	return summoner, err
 }
 

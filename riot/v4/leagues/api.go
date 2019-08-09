@@ -13,7 +13,12 @@ var buildUri = v4.BuildUriFunc(`league`)
 func getLeague(c riot.ApiClient, endpoint string) (league League, err error) {
 	req := c.NewRequest(buildUri(endpoint))
 
-	req.Get(&league)
+	resp, err := c.Get(req)
+	if err != nil {
+		return league, err
+	}
+
+	err = riot.GetResultFromResp(resp, &league)
 	return league, err
 }
 
@@ -23,7 +28,12 @@ func getEntries(c riot.ApiClient, endpoint string, page int) (entries []LeagueEn
 		req.AddParameter(`page`, strconv.Itoa(page))
 	}
 
-	err = req.Get(&entries)
+	resp, err := c.Get(req)
+	if err != nil {
+		return entries, err
+	}
+
+	err = riot.GetResultFromResp(resp, entries)
 	return entries, err
 }
 

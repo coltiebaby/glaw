@@ -1,14 +1,17 @@
+// A fancy stopwatch that monitors the rate we fill ratelimit.jar.Jar
 package clock
 
 import (
 	"time"
 )
 
-func FillRate(limit, seconds int) time.Duration {
+// Figures out the pace to fill the bucket.
+func FillRate(maxLimit, seconds int) time.Duration {
 	ms := time.Duration(seconds) * time.Second
-	return ms / time.Duration(limit)
+	return ms / time.Duration(maxLimit)
 }
 
+// Basic timer that helps monitor the rate we fill the bucket
 type Clock interface {
 	Finish() error
 	Tick() <-chan time.Time
