@@ -26,7 +26,7 @@ func All(c riot.ApiClient, id string) (cm []ChampionMastery, err error) {
 
 	resp, err := c.Get(req)
 	if err != nil {
-		return ci, err
+		return cm, err
 	}
 
 	err = riot.GetResultFromResp(resp, &cm)

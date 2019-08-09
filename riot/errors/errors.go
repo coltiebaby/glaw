@@ -2,6 +2,7 @@ package errors
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,11 +22,10 @@ func NewErrorFromString(msg string) *RequestError {
 }
 
 func NewRequestError(resp *http.Response) *RequestError {
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	// if err != nil {
-	// 	// TODO: Do something
-	// }
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return NewErrorFromString(fmt.Sprintf("Could not read error from body: %s", err))
+	}
 
 	code := resp.StatusCode
 

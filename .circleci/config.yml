@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run:
+          name: Go tests
+          command: go test -v ./...
+      - run:
+          name: Is code formatted
+          command: |
+            if [[ $(go fmt ./...) ]]; then
+                exit 1
+            fi
+          on_fail:
+            echo -e "\e[31m Please format your changes. \e[0m"
