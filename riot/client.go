@@ -35,10 +35,6 @@ func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 		uri: uri,
 	}
 
-	if rc.rateLimitEnabled {
-		rc.limiter.Take(int(rc.region))
-	}
-
 	return req
 }
 
@@ -53,12 +49,14 @@ func (rc *RiotClient) Get(req ApiRequest) (resp *http.Response, err error) {
 		RawQuery: req.Encode(),
 	}
 
-	var e error
-	if resp, e = get(u); e != nil {
-		err = errors.NewErrorFromString(e.Error())
+	if rc.rateLimitEnabled {
+		rc.limiter.Take(int(rc.region))
 	}
 
-	fmt.Println("Get", err)
+	if resp, err = get(u); err != nil {
+		err = errors.NewErrorFromString(err.Error())
+	}
+
 	return resp, err
 
 }
@@ -116,6 +114,5 @@ func get(u *url.URL) (resp *http.Response, err error) {
 		return resp, err
 	}
 
-	fmt.Println("get", err)
 	return resp, err
 }
