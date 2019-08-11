@@ -48,10 +48,12 @@ type Timeline struct {
 	FrameInterval int     `json:"frameInterval"`
 }
 
-func (m Timeline) Filter(by ...string) {
+func (m Timeline) Filter(by ...string) (frames []Frame) {
+	frames = make([]Frame, len(m.Frames))
 	for i, frame := range m.Frames {
 		events := filter(frame.Events, by)
-		frame.Events = events
-		m.Frames[i] = frame
+		frames[i].Events = events
 	}
+
+	return frames
 }
