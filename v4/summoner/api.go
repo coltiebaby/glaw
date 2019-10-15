@@ -1,8 +1,8 @@
 package summoner
 
 import (
-	"github.com/coltiebaby/g-law/riot"
-	"github.com/coltiebaby/g-law/riot/v4"
+	"github.com/coltiebaby/glaw/riot"
+	"github.com/coltiebaby/glaw/riot/v4"
 )
 
 var buildUri = v4.BuildUriFunc(`summoner`)

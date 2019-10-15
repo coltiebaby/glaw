@@ -1,8 +1,8 @@
 package ratelimit
 
 import (
-	"github.com/coltiebaby/g-law/ratelimit/clock"
-	"github.com/coltiebaby/g-law/ratelimit/jar"
+	"github.com/coltiebaby/glaw/ratelimit/clock"
+	"github.com/coltiebaby/glaw/ratelimit/jar"
 )
 
 type RateLimit struct {

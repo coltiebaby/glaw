@@ -3,7 +3,7 @@
 Holds enums related to regions
 */
 
-package riot
+package glaw
 
 type Region int
 

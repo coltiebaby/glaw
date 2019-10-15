@@ -1,13 +1,13 @@
-package riot
+package glaw
 
 import (
 	"net/http"
 	"net/url"
 
-	"github.com/coltiebaby/g-law/config"
-	"github.com/coltiebaby/g-law/ratelimit"
-	"github.com/coltiebaby/g-law/ratelimit/clock"
-	"github.com/coltiebaby/g-law/ratelimit/jar"
+	"github.com/coltiebaby/glaw/config"
+	"github.com/coltiebaby/glaw/ratelimit"
+	"github.com/coltiebaby/glaw/ratelimit/clock"
+	"github.com/coltiebaby/glaw/ratelimit/jar"
 )
 
 var (

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/coltiebaby/g-law/riot"
+	"github.com/coltiebaby/glaw/riot"
 )
 
 // Match Filter will help you sort through match history.

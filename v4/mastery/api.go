@@ -3,8 +3,8 @@ package mastery
 import (
 	"fmt"
 
-	"github.com/coltiebaby/g-law/riot"
-	"github.com/coltiebaby/g-law/riot/v4"
+	"github.com/coltiebaby/glaw/riot"
+	"github.com/coltiebaby/glaw/riot/v4"
 )
 
 var makeUri = v4.BuildUriFunc(`champion-mastery`)
