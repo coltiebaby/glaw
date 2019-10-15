@@ -3,13 +3,13 @@ package mastery
 import (
 	"fmt"
 
-	"github.com/coltiebaby/glaw/riot"
-	"github.com/coltiebaby/glaw/riot/v4"
+	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/v4"
 )
 
 var makeUri = v4.BuildUriFunc(`champion-mastery`)
 
-func Score(c riot.ApiClient, id string) (score int, err error) {
+func Score(c glaw.ApiClient, id string) (score int, err error) {
 	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
 
 	resp, err := c.Get(req)
@@ -17,11 +17,11 @@ func Score(c riot.ApiClient, id string) (score int, err error) {
 		return score, err
 	}
 
-	err = riot.GetResultFromResp(resp, &score)
+	err = glaw.GetResultFromResp(resp, &score)
 	return score, err
 }
 
-func All(c riot.ApiClient, id string) (cm []ChampionMastery, err error) {
+func All(c glaw.ApiClient, id string) (cm []ChampionMastery, err error) {
 	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
 
 	resp, err := c.Get(req)
@@ -29,11 +29,11 @@ func All(c riot.ApiClient, id string) (cm []ChampionMastery, err error) {
 		return cm, err
 	}
 
-	err = riot.GetResultFromResp(resp, &cm)
+	err = glaw.GetResultFromResp(resp, &cm)
 	return cm, err
 }
 
-func ByChampionId(c riot.ApiClient, id string, championId int) (cm ChampionMastery, err error) {
+func ByChampionId(c glaw.ApiClient, id string, championId int) (cm ChampionMastery, err error) {
 	endpoint := fmt.Sprintf(`champion-masteries/by-summoner/%s/by-champion/%d`, id, championId)
 	req := c.NewRequest(makeUri(endpoint))
 
@@ -42,6 +42,6 @@ func ByChampionId(c riot.ApiClient, id string, championId int) (cm ChampionMaste
 		return cm, err
 	}
 
-	err = riot.GetResultFromResp(resp, &cm)
+	err = glaw.GetResultFromResp(resp, &cm)
 	return cm, err
 }
