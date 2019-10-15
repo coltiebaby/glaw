@@ -15,7 +15,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/coltiebaby/glaw/"
+	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/v4/summoner"
 )
 

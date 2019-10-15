@@ -40,7 +40,7 @@ func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
 
 func (rc *RiotClient) Get(req ApiRequest) (resp *http.Response, err error) {
 	platform := RegionsPlatform[rc.region]
-	host := fmt.Sprintf("%s.api.games.com", strings.ToLower(platform))
+	host := fmt.Sprintf("%s.api.riotgames.com", strings.ToLower(platform))
 
 	u := &url.URL{
 		Scheme:   "https",
