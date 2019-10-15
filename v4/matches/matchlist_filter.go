@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/coltiebaby/glaw/"
+	"github.com/coltiebaby/glaw"
 )
 
 // Match Filter will help you sort through match history.
@@ -84,7 +84,7 @@ func (filter *MatchFilter) Next() (matches MatchStorage, err error) {
 
 	filter.begin, filter.end = begin, end
 
-	matches, err = GetMatchlists(filterglaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -100,7 +100,7 @@ func (filter *MatchFilter) Prev() (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filterglaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -114,7 +114,7 @@ func (filter *MatchFilter) GoTo(page int) (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filterglaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
