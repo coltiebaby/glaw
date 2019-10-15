@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/coltiebaby/g-law/riot"
-	"github.com/coltiebaby/g-law/riot/v4"
+	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/v4"
 )
 
 var buildUri = v4.BuildUriFunc(`match`)
 
-func GetMatchlists(c riot.ApiClient, id string, values url.Values) (matches MatchStorage, err error) {
+func GetMatchlists(c glaw.ApiClient, id string, values url.Values) (matches MatchStorage, err error) {
 	uri := buildUri(fmt.Sprintf(`matchlists/by-account/%s`, id))
 
 	req := c.NewRequest(uri)
@@ -21,11 +21,11 @@ func GetMatchlists(c riot.ApiClient, id string, values url.Values) (matches Matc
 		return matches, err
 	}
 
-	err = riot.GetResultFromResp(resp, &matches)
+	err = glaw.GetResultFromResp(resp, &matches)
 	return matches, err
 }
 
-func GetMatch(c riot.ApiClient, match_id string) (match Match, err error) {
+func GetMatch(c glaw.ApiClient, match_id string) (match Match, err error) {
 	uri := buildUri("matches/" + match_id)
 	req := c.NewRequest(uri)
 
@@ -34,11 +34,11 @@ func GetMatch(c riot.ApiClient, match_id string) (match Match, err error) {
 		return match, err
 	}
 
-	err = riot.GetResultFromResp(resp, &match)
+	err = glaw.GetResultFromResp(resp, &match)
 	return match, err
 }
 
-func GetTimeline(c riot.ApiClient, match_id string) (tl Timeline, err error) {
+func GetTimeline(c glaw.ApiClient, match_id string) (tl Timeline, err error) {
 	uri := buildUri("timelines/by-match/" + match_id)
 	req := c.NewRequest(uri)
 
@@ -47,6 +47,6 @@ func GetTimeline(c riot.ApiClient, match_id string) (tl Timeline, err error) {
 		return tl, err
 	}
 
-	err = riot.GetResultFromResp(resp, &tl)
+	err = glaw.GetResultFromResp(resp, &tl)
 	return tl, err
 }

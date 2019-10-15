@@ -1,4 +1,4 @@
-package riot
+package glaw
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/coltiebaby/g-law/ratelimit"
-	"github.com/coltiebaby/g-law/riot/errors"
+	"github.com/coltiebaby/glaw/errors"
+	"github.com/coltiebaby/glaw/ratelimit"
 )
 
 type RiotClient struct {

@@ -7,15 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/coltiebaby/g-law/riot"
+	"github.com/coltiebaby/glaw"
 )
 
 // Match Filter will help you sort through match history.
-// To get a list of the IDs, you'll need to look at the [constants](*url) riot supports
+// To get a list of the IDs, you'll need to look at the [constants](*url)  supports
 //
-// url: https://developer.riotgames.com/game-constants.html
+// url: https://developer.games.com/game-constants.html
 type MatchFilter struct {
-	Client riot.ApiClient
+	Client glaw.ApiClient
 
 	AccountID string
 	Start     time.Time
@@ -43,7 +43,7 @@ func getIndex(max, page int) (begin int, end int) {
 	return begin, end
 }
 
-func NewMatchFilter(c riot.ApiClient, start, end time.Time) (filter *MatchFilter) {
+func NewMatchFilter(c glaw.ApiClient, start, end time.Time) (filter *MatchFilter) {
 	filter = &MatchFilter{Client: c}
 
 	filter.Start = start
@@ -84,7 +84,7 @@ func (filter *MatchFilter) Next() (matches MatchStorage, err error) {
 
 	filter.begin, filter.end = begin, end
 
-	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -100,7 +100,7 @@ func (filter *MatchFilter) Prev() (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -114,7 +114,7 @@ func (filter *MatchFilter) GoTo(page int) (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
