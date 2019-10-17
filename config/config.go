@@ -20,12 +20,14 @@ func NewConfig(token string) *Config {
 
 // Fetches the config info from the environ.
 // Returns an error if the token is not set.
-func FromEnv() *Config {
+func FromEnv() (c *Config, err error) {
 	if token, ok := os.LookupEnv(TOKEN_ENV); ok {
-		return NewConfig(token)
+		c = NewConfig(token)
+	} else {
+		err = TokenNotSetErr
 	}
 
-	panic(TokenNotSetErr)
+	return c, err
 }
 
 func CtxGetToken(ctx context.Context) (token string, err error) {
