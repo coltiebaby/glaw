@@ -18,14 +18,20 @@ func set() {
 func cleanup() {
 	os.Unsetenv(env)
 }
+func TestConfigFromEnvError(t *testing.T) {
+	c, err := FromEnv()
+	if c != nil || err != TokenNotSetErr {
+		t.Error("Token should not been set")
+	}
+}
 
 func TestConfigFromEnv(t *testing.T) {
 	set()
 	defer cleanup()
 
-	c := FromEnv()
+	c, err := FromEnv()
 
-	if c.Token != KEY {
+	if c.Token != KEY || err != nil {
 		t.Error("Failed to get token...")
 	}
 }

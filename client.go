@@ -15,15 +15,17 @@ type RiotClient struct {
 	region           Region
 	rateLimitEnabled bool
 	limiter          ratelimit.Limiter
+	token            string
 }
 
-func NewRiotClient(region Region, enabled bool) *RiotClient {
+func NewRiotClient(token string, region Region, enabled bool) *RiotClient {
 	var rateLimiter ratelimit.Limiter
 	if enabled {
 		rateLimiter = SetupRateLimiter(enabled)
 	}
 
 	return &RiotClient{
+		token:            token,
 		rateLimitEnabled: enabled,
 		region:           region,
 		limiter:          rateLimiter,
@@ -53,7 +55,7 @@ func (rc *RiotClient) Get(req ApiRequest) (resp *http.Response, err error) {
 		rc.limiter.Take(int(rc.region))
 	}
 
-	if resp, err = get(u); err != nil {
+	if resp, err = get(rc.token, u); err != nil {
 		err = errors.NewErrorFromString(err.Error())
 	}
 
@@ -102,13 +104,13 @@ func isBad(code int) bool {
 	return (code >= 200 && code < 300) != true
 }
 
-func get(u *url.URL) (resp *http.Response, err error) {
+func get(token string, u *url.URL) (resp *http.Response, err error) {
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return resp, err
 	}
 
-	req.Header.Add("X-Riot-Token", c.Token)
+	req.Header.Add("X-Riot-Token", token)
 	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return resp, err

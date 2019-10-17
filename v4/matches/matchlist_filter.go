@@ -84,7 +84,7 @@ func (filter *MatchFilter) Next() (matches MatchStorage, err error) {
 
 	filter.begin, filter.end = begin, end
 
-	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -100,7 +100,7 @@ func (filter *MatchFilter) Prev() (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }
@@ -114,7 +114,7 @@ func (filter *MatchFilter) GoTo(page int) (matches MatchStorage, err error) {
 	filter.begin, filter.end = getIndex(filter.maxResults, page)
 	filter.page = page
 
-	matches, err = GetMatchlists(glaw.Client, filter.AccountID, filter.CreateValues())
+	matches, err = GetMatchlists(filter.Client, filter.AccountID, filter.CreateValues())
 	filter.totalResults = matches.TotalGames
 	return matches, err
 }

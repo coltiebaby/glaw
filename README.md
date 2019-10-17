@@ -20,7 +20,14 @@ import (
 )
 
 func main() {
-	summoner, err := summoner.ByName(glaw.Client, `Oscillation`)
+    c, err := config.FromEnv()
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    client := glaw.NewRiotClient(c.Token, glaw.REGION_NA, true)
+	summoner, err := summoner.ByName(client, `Oscillation`)
 	if err != nil {
 		fmt.Println("Got an err:", err)
 		return

@@ -11,7 +11,15 @@ type RateLimit struct {
 	jar jar.Jar
 }
 
-func NewRateLimit(c clock.Clock, j jar.Jar) (rl *RateLimit) {
+func NewRateLimit(max, burst, seconds int) (rl *RateLimit) {
+	c := clock.NewClock(max, seconds)
+	j := jar.NewBucket(burst)
+	rl = newRateLimit(c, j)
+
+	return rl
+}
+
+func newRateLimit(c clock.Clock, j jar.Jar) (rl *RateLimit) {
 	rl = &RateLimit{
 		jar: j,
 	}

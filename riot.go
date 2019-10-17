@@ -4,16 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/coltiebaby/glaw/config"
 	"github.com/coltiebaby/glaw/ratelimit"
-	"github.com/coltiebaby/glaw/ratelimit/clock"
-	"github.com/coltiebaby/glaw/ratelimit/jar"
-)
-
-var (
-	c = config.FromEnv()
-	// Client = NewClient(REGION_NA, c.EnableRateLimiting)
-	Client ApiClient = NewRiotClient(REGION_NA, c.EnableRateLimiting)
 )
 
 // SetupRateLimit creates a new Default Limiter to monitor our requests
@@ -22,11 +13,7 @@ func SetupRateLimiter(enabled bool) ratelimit.Limiter {
 	limiter := ratelimit.NewRateLimiter(enabled)
 
 	for r, _ := range Regions {
-		c := clock.NewClock(100, 120)
-		j := jar.NewBucket(20)
-
-		rl := ratelimit.NewRateLimit(c, j)
-
+		rl := ratelimit.NewRateLimit(100, 20, 120)
 		limiter.Add(int(r), rl)
 	}
 
