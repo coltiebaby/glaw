@@ -122,12 +122,22 @@ func (filter *MatchFilter) GoTo(page int) (matches MatchStorage, err error) {
 func (filter *MatchFilter) CreateValues() url.Values {
 	params := url.Values{}
 
-	add(&params, `champion`, filter.Champions)
-	add(&params, `queue`, filter.Queues)
-	add(&params, `season`, filter.Seasons)
+	if len(filter.Champions) > 0 {
+		add(&params, `champion`, filter.Champions)
+	}
 
-	params.Add(`startIndex`, strconv.Itoa(filter.begin))
-	params.Add(`endIndex`, strconv.Itoa(filter.end))
+	if len(filter.Queues) > 0 {
+		add(&params, `queue`, filter.Queues)
+	}
+
+	if len(filter.Seasons) > 0 {
+		add(&params, `season`, filter.Seasons)
+	}
+
+	if filter.begin != 0 && filter.end != 0 {
+		params.Add(`startIndex`, strconv.Itoa(filter.begin))
+		params.Add(`endIndex`, strconv.Itoa(filter.end))
+	}
 
 	// TODO: Not sure why these aren't working
 	// from := timeToUnixMS(filter.Start)
