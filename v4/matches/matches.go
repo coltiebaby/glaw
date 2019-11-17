@@ -1,5 +1,9 @@
 package matches
 
+import (
+	"fmt"
+)
+
 type Player struct {
 	CurrentPlatformID string `json:"currentPlatformId"`
 	SummonerName      string `json:"summonerName"`
@@ -49,4 +53,16 @@ type Match struct {
 	Participants          []Participant   `json:"participants"`
 	GameDuration          int             `json:"gameDuration"`
 	GameCreation          int64           `json:"gameCreation"`
+}
+
+func (m Match) GetParticipantId(summonerName string) (pid ParticipantID, err error) {
+	for _, player := range m.ParticipantIdentities {
+		if player.Player.SummonerName == summonerName {
+			pid = player
+			return pid, err
+		}
+	}
+
+	err = fmt.Errorf("player not found: %s", summonerName)
+	return pid, err
 }
