@@ -7,41 +7,59 @@ import (
 	"github.com/coltiebaby/glaw/v4"
 )
 
-var makeUri = v4.BuildUriFunc(`champion-mastery`)
-
-func Score(c glaw.ApiClient, id string) (score int, err error) {
-	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
-
-	resp, err := c.Get(req)
-	if err != nil {
-		return score, err
-	}
-
-	err = glaw.GetResultFromResp(resp, &score)
-	return score, err
+type MasteryRequest struct {
+    Region Region
+    EncryptedSummonerId string
+    ChampionId int
 }
 
-func All(c glaw.ApiClient, id string) (cm []ChampionMastery, err error) {
-	req := c.NewRequest(makeUri(`champion-masteries/by-summoner/` + id))
-
-	resp, err := c.Get(req)
-	if err != nil {
-		return cm, err
-	}
-
-	err = glaw.GetResultFromResp(resp, &cm)
-	return cm, err
+func newMasteryRequest(query string) Request {
+    return Request {
+        Method: `GET`
+        Domain: `champion-mastery`
+        Version: V4,
+        Uri: query,
+    }
 }
 
-func ByChampionId(c glaw.ApiClient, id string, championId int) (cm ChampionMastery, err error) {
-	endpoint := fmt.Sprintf(`champion-masteries/by-summoner/%s/by-champion/%d`, id, championId)
-	req := c.NewRequest(makeUri(endpoint))
+func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score int, err error) {
+    req := newMasteryRequest(fmt.Sprintf(`scores/by-summoner/%s`, mr.EncryptedSummonerId))
+    req.Region = mr.Region
 
-	resp, err := c.Get(req)
-	if err != nil {
-		return cm, err
-	}
+    resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+    if err != nil {
+        return ci, err
+    }
 
-	err = glaw.GetResultFromResp(resp, &cm)
+    err = ProcessRequest(resp, &score)
+
+    return score, err
+}
+
+func (c *Client) ChampionMasteries(c glaw.ApiClient, mr MasteryRequest) (cm []ChampionMastery, err error) {
+    req := newMasteryRequest(fmt.Sprintf(`champion-masteries/by-summoner/%s`, mr.EncryptedSummonerId))
+    req.Region = mr.Region
+
+    resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+    if err != nil {
+        return ci, err
+    }
+
+    err = ProcessRequest(resp, &cm)
+
+    return cm, err
+}
+
+func (c *Client) MasteriesByChampionId(c glaw.ApiClient, mr MasteryRequest) (cm ChampionMastery, err error) {
+    template := `champion-masteries/by-summoner/%s/by-champion/%d`
+    req := newMasteryRequest(fmt.Sprintf(template, mr.EncryptedSummonerId, mr.ChampionId))
+    req.Region = mr.Region
+
+    resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+    if err != nil {
+        return ci, err
+    }
+
+    err = ProcessRequest(resp, &cm)
 	return cm, err
 }

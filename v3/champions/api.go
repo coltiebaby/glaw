@@ -2,19 +2,26 @@ package champions
 
 import (
 	"github.com/coltiebaby/glaw"
-	"github.com/coltiebaby/glaw/v3"
 )
 
-var buildUri = v3.BuildUriFunc(`platform`)
+type ChampionRotationsRequest struct {
+    Region Region
+}
 
-func FreeChampions(c glaw.ApiClient) (ci ChampionInfo, err error) {
-	req := c.NewRequest(buildUri(`champion-rotations`))
+func (c *Client) ChampionRotations(ctx context.Context, fcr ChampionRotationsRequest) (ci ChampionInfo, err error) {
+    req := Request {
+        Method: `GET`
+        Domain: `platform`
+        Version: V3,
+        Region fcr.Region
+        Uri: `champion-rotations`,
+    }
 
-	resp, err := c.Get(req)
-	if err != nil {
-		return ci, err
-	}
+    resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+    if err != nil {
+        return ci, err
+    }
 
-	err = glaw.GetResultFromResp(resp, &ci)
-	return ci, err
+    err = ProcessRequest(resp, &ci)
+    return ci, err
 }

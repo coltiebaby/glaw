@@ -8,8 +8,6 @@ import (
 	"github.com/coltiebaby/glaw/v4"
 )
 
-var buildUri = v4.BuildUriFunc(`league`)
-
 func getLeague(c glaw.ApiClient, endpoint string) (league League, err error) {
 	req := c.NewRequest(buildUri(endpoint))
 
@@ -37,19 +35,44 @@ func getEntries(c glaw.ApiClient, endpoint string, page int) (entries []LeagueEn
 	return entries, err
 }
 
-func Challengers(c glaw.ApiClient, queue Queue) (league League, err error) {
-	league, err = getLeague(c, fmt.Sprintf(`challengerleagues/by-queue/%s`, queue))
-	return league, err
+type QueueRequest struct {
+    Id string
+    Queue Queue
 }
 
-func Masters(c glaw.ApiClient, queue Queue) (league League, err error) {
-	league, err = getLeague(c, fmt.Sprintf(`masterleagues/by-queue/%s`, queue))
-	return league, err
+func (qr QueueRequest) String() string {
+    template := `%sleagues/by-queue/%s`
+    return fmt.Sprintf(lqr.Id, lqr.Queue)
 }
 
-func GrandMasters(c glaw.ApiClient, queue Queue) (league League, err error) {
-	league, err = getLeague(c, fmt.Sprintf(`grandmasterleagues/by-queue/%s`, queue))
-	return league, err
+func (c *Client) Queue(ctx context.Context, lqr LeagueQueueRequest) (league League, err error) {
+    req, err := http.NewRequestWithContext(ctx, http.Get, lqr.String(), nil)
+
+    resp, err := c.Do(req)
+    if err != nil {
+        return ci, err
+    }
+
+    err = ProcessRequest(resp, &league)
+    return league, err
+}
+
+const (
+    Challenger = `challenger`
+    Master = `master`
+    GrandMaster = `challenger`
+)
+
+type LeagueRequest struct {
+    Id string
+}
+
+func (lr LeagueRequest) String() string {
+    return fmt.Sprintf(`leagues/%s`, lr.Id)
+}
+
+func (c *Client) League(ctx context.Context, lr LeagueRequest) (league League, err error) {
+
 }
 
 func GetLeagueByID(c glaw.ApiClient, leagueID string) (league League, err error) {

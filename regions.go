@@ -1,11 +1,19 @@
-/* regions.go
-
-Holds enums related to regions
-*/
-
 package glaw
 
+import (
+    "fmt"
+    "strings"
+)
+
 type Region int
+
+func (r Region) Base() string {
+    return fmt.Sprintf(`%s.api.riotgames.com`, strings.ToLower(RegionsPlatform[r]))
+}
+
+func (r Region) String() string {
+    return Regions[r]
+}
 
 const (
 	REGION_NA Region = iota + 1
