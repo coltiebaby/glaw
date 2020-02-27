@@ -3,17 +3,14 @@ package glaw
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
-	"net/url"
 	"strings"
-
-	"github.com/coltiebaby/glaw/errors"
-	"github.com/coltiebaby/glaw/ratelimit"
+	"text/template"
 )
 
 type Client struct {
-	client http.Client
+	client *http.Client
 	token  string
 }
 
@@ -22,7 +19,7 @@ type Option interface {
 }
 
 func NewClient(token string, opts ...Option) (c *Client, err error) {
-	c := &Client{
+	c = &Client{
 		client: http.DefaultClient,
 		token:  token,
 	}
@@ -37,7 +34,7 @@ func NewClient(token string, opts ...Option) (c *Client, err error) {
 }
 
 func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
-	req.Header.Add("X-Riot-Token", token)
+	req.Header.Add("X-Riot-Token", c.token)
 	resp, err = c.client.Do(req)
 	if err != nil {
 		return resp, err
@@ -62,13 +59,13 @@ type Request struct {
 
 func (r Request) URL() string {
 	t := template.Must(template.New(`url`).Parse(partial))
-	var b strings.Builder
+	b := &strings.Builder{}
 
 	t.Execute(b, r)
 	return b.String()
 }
 
-func (r Request) NewHttpRequestWithCtx(ctx context.Context) *http.Request {
+func (r Request) NewHttpRequestWithCtx(ctx context.Context) (*http.Request, error) {
 	return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
 }
 

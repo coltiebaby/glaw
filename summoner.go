@@ -1,6 +1,7 @@
 package glaw
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -26,7 +27,7 @@ func (sr SummonerRequest) String() string {
 	return uri
 }
 
-func (c *Client) Summoner(sr SummonerRequest) (summoner Summoner, err error) {
+func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner Summoner, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `summoner`,
@@ -35,12 +36,17 @@ func (c *Client) Summoner(sr SummonerRequest) (summoner Summoner, err error) {
 		Uri:     sr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return summoner, err
 	}
 
-	err = ProcessRequest(resp, &summoner)
+	resp, err := c.Do(r)
+	if err != nil {
+		return summoner, err
+	}
+
+	err = ProcessResponse(resp, &summoner)
 	return summoner, err
 }
 

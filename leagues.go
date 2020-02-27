@@ -1,6 +1,7 @@
 package glaw
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -12,29 +13,35 @@ type QueueRequest struct {
 
 func (qr QueueRequest) String() string {
 	template := `%sleagues/by-queue/%s`
-	return fmt.Sprintf(lqr.Type, lqr.Queue)
+	return fmt.Sprintf(qr.Type, qr.Queue)
 }
 
-func (c *Client) Queue(ctx context.Context, lqr LeagueQueueRequest) (league League, err error) {
+func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league League, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `league`,
 		Version: V4,
-		Region:  lqr.Region,
+		Region:  qr.Region,
 		Uri:     qr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
-		return ci, err
+		return league, err
 	}
 
-	err = ProcessRequest(resp, &ci)
-	return ci, err
+	resp, err := c.Do(r)
+	if err != nil {
+		return league, err
+	}
+
+	err = ProcessResponse(resp, &league)
+	return league, err
 }
 
 type LeagueRequest struct {
-	ID string
+	ID     string
+	Region Region
 }
 
 func (lr LeagueRequest) String() string {
@@ -50,12 +57,17 @@ func (c *Client) League(ctx context.Context, lr LeagueRequest) (league League, e
 		Uri:     lr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return league, err
 	}
 
-	err = ProcessRequest(resp, &league)
+	resp, err := c.Do(r)
+	if err != nil {
+		return league, err
+	}
+
+	err = ProcessResponse(resp, &league)
 	return league, err
 }
 

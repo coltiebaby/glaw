@@ -1,6 +1,7 @@
 package glaw
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -22,12 +23,17 @@ func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score in
 		Uri:     lr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return score, err
 	}
 
-	err = ProcessRequest(resp, &score)
+	resp, err := c.Do(r)
+	if err != nil {
+		return score, err
+	}
+
+	err = ProcessResponse(resp, &score)
 	return score, err
 }
 
@@ -40,7 +46,7 @@ func (mr MasteryRequest) String() string {
 	return fmt.Sprintf("champion-masteries/by-summoner/%s", mr.EncryptedSummonerID)
 }
 
-func (c *Client) ChampionMasteries(c glaw.ApiClient, mr MasteryRequest) (cm []ChampionMastery, err error) {
+func (c *Client) ChampionMasteries(ctx context.Context, mr MasteryRequest) (cm []ChampionMastery, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `champion-mastery`,
@@ -49,12 +55,17 @@ func (c *Client) ChampionMasteries(c glaw.ApiClient, mr MasteryRequest) (cm []Ch
 		Uri:     lr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return cm, err
 	}
 
-	err = ProcessRequest(resp, &cm)
+	resp, err := c.Do(r)
+	if err != nil {
+		return cm, err
+	}
+
+	err = ProcessResponse(resp, &cm)
 	return cm, err
 }
 
@@ -68,7 +79,7 @@ func (mr MasteriesRequest) String() string {
 	return fmt.Sprintf("champion-masteries/by-summoner/%s/by-champion/%s", EncryptedSummonerID, ChampionID)
 }
 
-func (c *Client) MasteriesByChampionId(mr MasteryRequest) (cm ChampionMastery, err error) {
+func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (cm ChampionMastery, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `champion-mastery`,
@@ -77,12 +88,17 @@ func (c *Client) MasteriesByChampionId(mr MasteryRequest) (cm ChampionMastery, e
 		Uri:     mr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return cm, err
 	}
 
-	err = ProcessRequest(resp, &cm)
+	resp, err := c.Do(r)
+	if err != nil {
+		return cm, err
+	}
+
+	err = ProcessResponse(resp, &cm)
 	return cm, err
 }
 

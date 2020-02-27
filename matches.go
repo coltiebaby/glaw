@@ -1,6 +1,7 @@
 package glaw
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -13,7 +14,7 @@ func (mr MatchRequest) String() string {
 	return fmt.Sprintf("matches/%s", mr.ID)
 }
 
-func (c *Client) Match(mr MatchRequest) (matches MatchStorage, err error) {
+func (c *Client) Match(ctx context.Context, mr MatchRequest) (matches MatchStorage, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `match`,
@@ -22,12 +23,17 @@ func (c *Client) Match(mr MatchRequest) (matches MatchStorage, err error) {
 		Uri:     mr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return matches, err
 	}
 
-	err = ProcessRequest(resp, &matches)
+	resp, err := c.Do(r)
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessResponse(resp, &matches)
 	return matches, err
 }
 
@@ -40,7 +46,7 @@ func (mr MatchesRequest) String() string {
 	return fmt.Sprintf("matchlists/by-account/%s", mr.AccountID)
 }
 
-func (c *Client) Matches(mr MatchRequest) (matches MatchStorage, err error) {
+func (c *Client) Matches(ctx context.Context, mr MatchRequest) (matches MatchStorage, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `match`,
@@ -49,12 +55,17 @@ func (c *Client) Matches(mr MatchRequest) (matches MatchStorage, err error) {
 		Uri:     mr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return matches, err
 	}
 
-	err = ProcessRequest(resp, &matches)
+	resp, err := c.Do(r)
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessResponse(resp, &matches)
 	return matches, err
 }
 
@@ -76,11 +87,16 @@ func (c *Client) Timeline(mr MatchRequest) (matches MatchStorage, err error) {
 		Uri:     mr.String(),
 	}
 
-	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	r, err := req.NewHttpRequestWithCtx(ctx)
 	if err != nil {
 		return matches, err
 	}
 
-	err = ProcessRequest(resp, &matches)
+	resp, err := c.Do(r)
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessResponse(resp, &matches)
 	return matches, err
 }
