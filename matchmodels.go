@@ -1,4 +1,68 @@
-package matches
+package glaw
+
+const (
+	CHAMPION_KILL      string = "CHAMPION_KILL"
+	WARD_PLACED        string = "WARD_PLACED"
+	WARD_KILL          string = "WARD_KILL"
+	BUILDING_KILL      string = "BUILDING_KILL"
+	ELITE_MONSTER_KILL string = "ELITE_MONSTER_KILL"
+	ITEM_PURCHASED     string = "ITEM_PURCHASED"
+	ITEM_SOLD          string = "ITEM_SOLD"
+	ITEM_DESTROYED     string = "ITEM_DESTROYED"
+	ITEM_UNDO          string = "ITEM_UNDO"
+	SKILL_LEVEL_UP     string = "SKILL_LEVEL_UP"
+	ASCENDED_EVENT     string = "ASCENDED_EVENT"
+	CAPTURE_POINT      string = "CAPTURE_POINT"
+	PORO_KING_SUMMON   string = "PORO_KING_SUMMON"
+)
+
+type Position struct {
+	Y int `json:"y"`
+	X int `json:"x"`
+}
+
+type ParticipantFrame struct {
+	TotalGold           int      `json:"totalGold"`
+	TeamScore           int      `json:"teamScore"`
+	ParticipantID       int      `json:"participantId"`
+	Level               int      `json:"level"`
+	CurrentGold         int      `json:"currentGold"`
+	MinionsKilled       int      `json:"minionsKilled"`
+	DominionScore       int      `json:"dominionScore"`
+	Position            Position `json:"position"`
+	Xp                  int      `json:"xp"`
+	JungleMinionsKilled int      `json:"jungleMinionsKilled"`
+}
+
+type Event struct {
+	Timestamp               int      `json:"timestamp"`
+	Type                    string   `json:"type"`
+	CreatorID               int      `json:"creatorId,omitempty"`
+	WardType                string   `json:"wardType,omitempty"`
+	SkillSlot               int      `json:"skillSlot,omitempty"`
+	LevelUpType             string   `json:"levelUpType,omitempty"`
+	ParticipantID           int      `json:"participantId,omitempty"`
+	ItemID                  int      `json:"itemId,omitempty"`
+	KillerID                int      `json:"killerId,omitempty"`
+	BuildingType            string   `json:"buildingType,omitempty"`
+	TowerType               string   `json:"towerType,omitempty"`
+	TeamID                  int      `json:"teamId,omitempty"`
+	AssistingParticipantIds []int    `json:"assistingParticipantIds,omitempty"`
+	Position                Position `json:"position,omitempty"`
+	LaneType                string   `json:"laneType,omitempty"`
+	VictimID                int      `json:"victimId,omitempty"`
+}
+
+type Frame struct {
+	Timestamp         int                         `json:"timestamp"`
+	ParticipantFrames map[string]ParticipantFrame `json:"participantFrames"`
+	Events            []Event                     `json:"events"`
+}
+
+type Timeline struct {
+	Frames        []Frame `json:"frames"`
+	FrameInterval int     `json:"frameInterval"`
+}
 
 type Delta struct {
 	Zero10 float64 `json:"0-10"`
@@ -127,4 +191,73 @@ type Stat struct {
 	TotalMinionsKilled             int  `json:"totalMinionsKilled"`
 	TimeCCingOthers                int  `json:"timeCCingOthers"`
 	StatPerk2                      int  `json:"statPerk2"`
+}
+
+type MatchStorage struct {
+	Matches    []MatchInfo `json:"matches"`
+	EndIndex   int         `json:"endIndex"`
+	StartIndex int         `json:"startIndex"`
+	TotalGames int         `json:"totalGames"`
+}
+
+type MatchInfo struct {
+	Lane       string `json:"lane"`
+	GameID     int64  `json:"gameId"`
+	Champion   int    `json:"champion"`
+	PlatformID string `json:"platformId"`
+	Timestamp  int64  `json:"timestamp"`
+	Queue      int    `json:"queue"`
+	Role       string `json:"role"`
+	Season     int    `json:"season"`
+}
+
+type Player struct {
+	CurrentPlatformID string `json:"currentPlatformId"`
+	SummonerName      string `json:"summonerName"`
+	MatchHistoryURI   string `json:"matchHistoryUri"`
+	PlatformID        string `json:"platformId"`
+	CurrentAccountID  string `json:"currentAccountId"`
+	ProfileIcon       int    `json:"profileIcon"`
+	SummonerID        string `json:"summonerId"`
+	AccountID         string `json:"accountId"`
+}
+
+type ParticipantID struct {
+	Player        Player `json:"player"`
+	ParticipantID int    `json:"participantId"`
+}
+
+type Team struct {
+	FirstDragon          bool          `json:"firstDragon"`
+	Bans                 []interface{} `json:"bans"`
+	FirstInhibitor       bool          `json:"firstInhibitor"`
+	Win                  string        `json:"win"`
+	FirstRiftHerald      bool          `json:"firstRiftHerald"`
+	FirstBaron           bool          `json:"firstBaron"`
+	BaronKills           int           `json:"baronKills"`
+	RiftHeraldKills      int           `json:"riftHeraldKills"`
+	FirstBlood           bool          `json:"firstBlood"`
+	TeamID               int           `json:"teamId"`
+	FirstTower           bool          `json:"firstTower"`
+	VilemawKills         int           `json:"vilemawKills"`
+	InhibitorKills       int           `json:"inhibitorKills"`
+	TowerKills           int           `json:"towerKills"`
+	DominionVictoryScore int           `json:"dominionVictoryScore"`
+	DragonKills          int           `json:"dragonKills"`
+}
+
+type Match struct {
+	SeasonID              int             `json:"seasonId"`
+	QueueID               int             `json:"queueId"`
+	GameID                int64           `json:"gameId"`
+	ParticipantIdentities []ParticipantID `json:"participantIdentities"`
+	GameVersion           string          `json:"gameVersion"`
+	PlatformID            string          `json:"platformId"`
+	GameMode              string          `json:"gameMode"`
+	MapID                 int             `json:"mapId"`
+	GameType              string          `json:"gameType"`
+	Teams                 []Team          `json:"teams"`
+	Participants          []Participant   `json:"participants"`
+	GameDuration          int             `json:"gameDuration"`
+	GameCreation          int64           `json:"gameCreation"`
 }

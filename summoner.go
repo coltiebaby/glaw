@@ -1,9 +1,33 @@
-/* Summoner.go
+package glaw
 
-Holds all related summoner structs
-*/
+import (
+	"fmt"
+)
 
-package summoner
+type SummonerRequest struct {
+	Type int
+	ID   string
+}
+
+func (sr SummonerRequest) String() string {
+	uri := sr.ID
+
+	switch sr.Type {
+	case SummonerID:
+	case SummonerName:
+		uri = fmt.Sprintf("by-name/%s", uri)
+	case SummonerPUUID:
+		uri = fmt.Sprintf("by-puuid/%s", uri)
+	case SummonerAccountID:
+		uri = fmt.Sprintf("by-account", uri)
+	}
+
+	return uri
+}
+
+func (c *Client) Summoner() (summoner Summoner, err error) {
+
+}
 
 type Summoner struct {
 	ID            string `json:"id"`
@@ -17,3 +41,10 @@ type Summoner struct {
 	// playing the tutorial or advanced tutorial, finishing a game, summoner name change
 	RevisionDate int64 `json:"revisionDate"`
 }
+
+const (
+	SummonerName = iota
+	SummonerID
+	SummonerAccountID
+	SummonerPUUID
+)

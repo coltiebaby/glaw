@@ -1,18 +1,18 @@
 package glaw
 
 import (
-    "fmt"
-    "strings"
+	"fmt"
+	"strings"
 )
 
 type Region int
 
 func (r Region) Base() string {
-    return fmt.Sprintf(`%s.api.riotgames.com`, strings.ToLower(RegionsPlatform[r]))
+	return fmt.Sprintf(`%s.api.riotgames.com`, strings.ToLower(RegionsPlatform[r]))
 }
 
 func (r Region) String() string {
-    return Regions[r]
+	return Regions[r]
 }
 
 const (
