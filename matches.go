@@ -5,7 +5,8 @@ import (
 )
 
 type MatchRequest struct {
-	ID string
+	ID     string
+	Region Region
 }
 
 func (mr MatchRequest) String() string {
@@ -13,11 +14,26 @@ func (mr MatchRequest) String() string {
 }
 
 func (c *Client) Match(mr MatchRequest) (matches MatchStorage, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `match`,
+		Version: V4,
+		Region:  mr.Region,
+		Uri:     mr.String(),
+	}
+
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessRequest(resp, &matches)
 	return matches, err
 }
 
 type MatchesRequest struct {
 	AccountID string
+	Region    Region
 }
 
 func (mr MatchesRequest) String() string {
@@ -25,11 +41,26 @@ func (mr MatchesRequest) String() string {
 }
 
 func (c *Client) Matches(mr MatchRequest) (matches MatchStorage, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `match`,
+		Version: V4,
+		Region:  mr.Region,
+		Uri:     mr.String(),
+	}
+
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessRequest(resp, &matches)
 	return matches, err
 }
 
 type TimelineRequest struct {
-	ID string
+	ID     string
+	Region Region
 }
 
 func (tr TimelineRequest) String() string {
@@ -37,5 +68,19 @@ func (tr TimelineRequest) String() string {
 }
 
 func (c *Client) Timeline(mr MatchRequest) (matches MatchStorage, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `match`,
+		Version: V4,
+		Region:  mr.Region,
+		Uri:     mr.String(),
+	}
+
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return matches, err
+	}
+
+	err = ProcessRequest(resp, &matches)
 	return matches, err
 }

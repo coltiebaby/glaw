@@ -5,8 +5,9 @@ import (
 )
 
 type SummonerRequest struct {
-	Type int
-	ID   string
+	Type   int
+	ID     string
+	Region Region
 }
 
 func (sr SummonerRequest) String() string {
@@ -25,8 +26,22 @@ func (sr SummonerRequest) String() string {
 	return uri
 }
 
-func (c *Client) Summoner() (summoner Summoner, err error) {
+func (c *Client) Summoner(sr SummonerRequest) (summoner Summoner, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `summoner`,
+		Version: V4,
+		Region:  sr.Region,
+		Uri:     sr.String(),
+	}
 
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return summoner, err
+	}
+
+	err = ProcessRequest(resp, &summoner)
+	return summoner, err
 }
 
 type Summoner struct {

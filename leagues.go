@@ -5,28 +5,58 @@ import (
 )
 
 type QueueRequest struct {
-	Id    string
-	Queue Queue
+	Type   string
+	Queue  Queue
+	Region Region
 }
 
 func (qr QueueRequest) String() string {
 	template := `%sleagues/by-queue/%s`
-	return fmt.Sprintf(lqr.Id, lqr.Queue)
+	return fmt.Sprintf(lqr.Type, lqr.Queue)
 }
 
 func (c *Client) Queue(ctx context.Context, lqr LeagueQueueRequest) (league League, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `league`,
+		Version: V4,
+		Region:  lqr.Region,
+		Uri:     qr.String(),
+	}
+
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return ci, err
+	}
+
+	err = ProcessRequest(resp, &ci)
+	return ci, err
 }
 
 type LeagueRequest struct {
-	Id string
+	ID string
 }
 
 func (lr LeagueRequest) String() string {
-	return fmt.Sprintf(`leagues/%s`, lr.Id)
+	return fmt.Sprintf(`leagues/%s`, lr.ID)
 }
 
 func (c *Client) League(ctx context.Context, lr LeagueRequest) (league League, err error) {
+	req := Request{
+		Method:  `GET`,
+		Domain:  `league`,
+		Version: V4,
+		Region:  lr.Region,
+		Uri:     lr.String(),
+	}
 
+	resp, err := c.Do(req.NewHttpRequestWithCtx(ctx))
+	if err != nil {
+		return league, err
+	}
+
+	err = ProcessRequest(resp, &league)
+	return league, err
 }
 
 // EntriesFactory builds out a closer to make it easier to get multiple pages
@@ -65,7 +95,7 @@ type Queue string
 const (
 	Challenger  = `challenger`
 	Master      = `master`
-	GrandMaster = `challenger`
+	GrandMaster = `grandmaster`
 )
 
 const (
