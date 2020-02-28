@@ -13,26 +13,27 @@ to run your stuff.
 package main
 
 import (
-	"fmt"
+	"context"
+	"log"
+	"os"
+	"time"
 
 	"github.com/coltiebaby/glaw"
-	"github.com/coltiebaby/glaw/v4/summoner"
 )
 
 func main() {
-    c, err := config.FromEnv()
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+	ctx, cleanup := context.WithTimeout(context.Background(), time.Second*3)
+	defer cleanup()
 
-    client := glaw.NewRiotClient(c.Token, glaw.REGION_NA, true)
-	summoner, err := summoner.ByName(client, `Oscillation`)
-	if err != nil {
-		fmt.Println("Got an err:", err)
-		return
+	client, _ := glaw.NewClient(glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")))
+	req := glaw.ChampionRotationsRequest{
+		Region: glaw.REGION_NA,
 	}
 
-	fmt.Printf("Current Summoner: %s -- Level: %d\n", summoner.Name, summoner.SummonerLevel)
+	free, err := client.ChampionRotations(ctx, req)
+	if err != nil {
+		log.Fatalf("%s", err)
+	}
+	log.Printf("%+v\n", free)
 }
 ```
