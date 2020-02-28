@@ -7,11 +7,11 @@ import (
 
 type ScoreRequest struct {
 	Region              Region
-	EncryptedSummonerId string
+	EncryptedSummonerID string
 }
 
 func (sr ScoreRequest) String() string {
-	return fmt.Sprintf("scores/by-summoner/%s", mr.EncryptedSummonerID)
+	return fmt.Sprintf("scores/by-summoner/%s", sr.EncryptedSummonerID)
 }
 
 func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score int, err error) {
@@ -19,8 +19,8 @@ func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score in
 		Method:  `GET`,
 		Domain:  `champion-mastery`,
 		Version: V4,
-		Region:  lr.Region,
-		Uri:     lr.String(),
+		Region:  mr.Region,
+		Uri:     mr.String(),
 	}
 
 	r, err := req.NewHttpRequestWithCtx(ctx)
@@ -51,8 +51,8 @@ func (c *Client) ChampionMasteries(ctx context.Context, mr MasteryRequest) (cm [
 		Method:  `GET`,
 		Domain:  `champion-mastery`,
 		Version: V4,
-		Region:  lr.Region,
-		Uri:     lr.String(),
+		Region:  mr.Region,
+		Uri:     mr.String(),
 	}
 
 	r, err := req.NewHttpRequestWithCtx(ctx)
@@ -76,7 +76,7 @@ type MasteriesRequest struct {
 }
 
 func (mr MasteriesRequest) String() string {
-	return fmt.Sprintf("champion-masteries/by-summoner/%s/by-champion/%s", EncryptedSummonerID, ChampionID)
+	return fmt.Sprintf("champion-masteries/by-summoner/%s/by-champion/%s", mr.EncryptedSummonerID, mr.ChampionID)
 }
 
 func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (cm ChampionMastery, err error) {

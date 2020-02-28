@@ -75,10 +75,10 @@ type TimelineRequest struct {
 }
 
 func (tr TimelineRequest) String() string {
-	return fmt.Sprintf("timelines/by-match/%s", mr.ID)
+	return fmt.Sprintf("timelines/by-match/%s", tr.ID)
 }
 
-func (c *Client) Timeline(mr MatchRequest) (matches MatchStorage, err error) {
+func (c *Client) Timeline(ctx context.Context, mr MatchRequest) (matches MatchStorage, err error) {
 	req := Request{
 		Method:  `GET`,
 		Domain:  `match`,

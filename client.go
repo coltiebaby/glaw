@@ -3,10 +3,9 @@ package glaw
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
-	"strings"
-	"text/template"
 )
 
 type Client struct {
@@ -18,10 +17,9 @@ type Option interface {
 	apply(*Client) (*Client, error)
 }
 
-func NewClient(token string, opts ...Option) (c *Client, err error) {
+func NewClient(opts ...Option) (c *Client, err error) {
 	c = &Client{
 		client: http.DefaultClient,
-		token:  token,
 	}
 
 	for _, opt := range opts {
@@ -58,29 +56,18 @@ type Request struct {
 }
 
 func (r Request) URL() string {
-	t := template.Must(template.New(`url`).Parse(partial))
-	b := &strings.Builder{}
-
-	t.Execute(b, r)
-	return b.String()
+	return fmt.Sprintf(partial, r.Region.Base(), r.Domain, r.Version, r.Uri)
 }
 
 func (r Request) NewHttpRequestWithCtx(ctx context.Context) (*http.Request, error) {
-	return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
+	return http.NewRequest(r.Method, r.URL(), r.Body)
+	// return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
 }
 
-func (r Request) NewHttpRequest() *http.Request {
+func (r Request) NewHttpRequest() (*http.Request, error) {
 	ctx := context.Background()
 
 	return r.NewHttpRequestWithCtx(ctx)
-}
-
-func NewRequest(method string, region Region, version Version) {
-	return Request{
-		Method:  method,
-		Version: version,
-		Region:  region,
-	}
 }
 
 type Version string
@@ -90,4 +77,4 @@ const (
 	V4 Version = `v4`
 )
 
-const partial = `"https://{{.Region.Base()}}/lol/{{.Domain}}/{{.Version}}/{{.Uri}}`
+const partial = "https://%s/lol/%s/%s/%s"

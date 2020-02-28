@@ -13,7 +13,7 @@ type QueueRequest struct {
 
 func (qr QueueRequest) String() string {
 	template := `%sleagues/by-queue/%s`
-	return fmt.Sprintf(qr.Type, qr.Queue)
+	return fmt.Sprintf(template, qr.Type, qr.Queue)
 }
 
 func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league League, err error) {
