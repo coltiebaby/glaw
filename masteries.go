@@ -76,7 +76,7 @@ type MasteriesRequest struct {
 }
 
 func (mr MasteriesRequest) String() string {
-	return fmt.Sprintf("champion-masteries/by-summoner/%s/by-champion/%s", mr.EncryptedSummonerID, mr.ChampionID)
+	return fmt.Sprintf("champion-masteries/by-summoner/%s/by-champion/%d", mr.EncryptedSummonerID, mr.ChampionID)
 }
 
 func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (cm ChampionMastery, err error) {

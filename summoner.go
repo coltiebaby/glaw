@@ -21,7 +21,7 @@ func (sr SummonerRequest) String() string {
 	case SummonerPUUID:
 		uri = fmt.Sprintf("by-puuid/%s", uri)
 	case SummonerAccountID:
-		uri = fmt.Sprintf("by-account", uri)
+		uri = fmt.Sprintf("by-account/%s", uri)
 	}
 
 	return uri
