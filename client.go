@@ -38,6 +38,10 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 		return resp, err
 	}
 
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		err = NewRequestError(resp)
+	}
+
 	return resp, err
 }
 
