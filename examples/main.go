@@ -1,15 +1,3 @@
-# G-Law
-
-A simple League of Legends api wrapper.
-
-## Setup
-
-Register for the [Riot Api](https://developer.games.com/) to get a developer key.
-Set the environmental variable `RIOT_API_TOKEN` to your new key where ever you're going
-to run your stuff.
-
-## Example
-```go
 package main
 
 import (
@@ -36,4 +24,3 @@ func main() {
 	}
 	log.Printf("%+v\n", free)
 }
-```

@@ -1,120 +1,84 @@
 package glaw
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/coltiebaby/glaw/errors"
-	"github.com/coltiebaby/glaw/ratelimit"
 )
 
-type RiotClient struct {
-	region           Region
-	rateLimitEnabled bool
-	limiter          ratelimit.Limiter
-	token            string
+type Client struct {
+	client *http.Client
+	token  string
 }
 
-func NewRiotClient(token string, region Region, enabled bool) *RiotClient {
-	var rateLimiter ratelimit.Limiter
-	if enabled {
-		rateLimiter = SetupRateLimiter(enabled)
+type Option interface {
+	apply(*Client) (*Client, error)
+}
+
+func NewClient(opts ...Option) (c *Client, err error) {
+	c = &Client{
+		client: http.DefaultClient,
 	}
 
-	return &RiotClient{
-		token:            token,
-		rateLimitEnabled: enabled,
-		region:           region,
-		limiter:          rateLimiter,
-	}
-}
-
-func (rc *RiotClient) NewRequest(uri string) (req ApiRequest) {
-	req = &RiotRequest{
-		uri: uri,
+	for _, opt := range opts {
+		if c, err := opt.apply(c); err != nil {
+			return c, err
+		}
 	}
 
-	return req
+	return c, err
 }
 
-func (rc *RiotClient) Get(req ApiRequest) (resp *http.Response, err error) {
-	platform := RegionsPlatform[rc.region]
-	host := fmt.Sprintf("%s.api.riotgames.com", strings.ToLower(platform))
-
-	u := &url.URL{
-		Scheme:   "https",
-		Host:     host,
-		Path:     fmt.Sprintf("lol/%s", req.Uri()),
-		RawQuery: req.Encode(),
-	}
-
-	if rc.rateLimitEnabled {
-		rc.limiter.Take(int(rc.region))
-	}
-
-	if resp, err = get(rc.token, u); err != nil {
-		err = errors.NewErrorFromString(err.Error())
-	}
-
-	return resp, err
-
-}
-
-func (rc *RiotClient) ChangeRegion(region Region) {
-	rc.region = region
-}
-
-type RiotRequest struct {
-	uri    string
-	params url.Values
-}
-
-func (rr *RiotRequest) Encode() string {
-	return rr.params.Encode()
-}
-
-func (rr *RiotRequest) Uri() string {
-	return rr.uri
-}
-
-func (rr *RiotRequest) AddParameter(key, value string) {
-	rr.params.Add(key, value)
-}
-
-func (rr *RiotRequest) SetParameters(params url.Values) {
-	rr.params = params
-}
-
-func GetResultFromResp(resp *http.Response, v interface{}) (err error) {
-	if e := json.NewDecoder(resp.Body).Decode(v); e != nil {
-		return errors.NewErrorFromString(e.Error())
-	}
-
-	if isBad(resp.StatusCode) {
-		err = errors.NewRequestError(resp)
-	}
-
-	return err
-}
-
-func isBad(code int) bool {
-	return (code >= 200 && code < 300) != true
-}
-
-func get(token string, u *url.URL) (resp *http.Response, err error) {
-	req, err := http.NewRequest("GET", u.String(), nil)
+func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
+	req.Header.Add("X-Riot-Token", c.token)
+	resp, err = c.client.Do(req)
 	if err != nil {
 		return resp, err
 	}
 
-	req.Header.Add("X-Riot-Token", token)
-	resp, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return resp, err
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		err = NewRequestError(resp)
 	}
 
 	return resp, err
 }
+
+func ProcessResponse(resp *http.Response, to interface{}) error {
+	defer resp.Body.Close()
+	return json.NewDecoder(resp.Body).Decode(to)
+}
+
+type Request struct {
+	Method  string
+	Domain  string
+	Version Version
+	Region  Region
+	Uri     string
+	Body    io.Reader
+}
+
+func (r Request) URL() string {
+	return fmt.Sprintf(partial, r.Region.Base(), r.Domain, r.Version, r.Uri)
+}
+
+func (r Request) NewHttpRequestWithCtx(ctx context.Context) (*http.Request, error) {
+	return http.NewRequest(r.Method, r.URL(), r.Body)
+	// return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
+}
+
+func (r Request) NewHttpRequest() (*http.Request, error) {
+	ctx := context.Background()
+
+	return r.NewHttpRequestWithCtx(ctx)
+}
+
+type Version string
+
+const (
+	V3 Version = `v3`
+	V4 Version = `v4`
+)
+
+const partial = "https://%s/lol/%s/%s/%s"
