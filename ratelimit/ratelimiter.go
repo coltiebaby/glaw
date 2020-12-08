@@ -1,15 +1,19 @@
 package ratelimit
 
+import (
+    "context"
+)
+
 func NewRateLimiter(enabled bool) *RateLimiter {
 	return &RateLimiter{
 		enabled: enabled,
-		timers:  make(map[int]Limit),
+		timers:  make(map[int]Limiter),
 	}
 }
 
 type RateLimiter struct {
 	enabled bool
-	timers  map[int]Limit
+	timers  map[int]Limiter
 }
 
 func (r *RateLimiter) Activate() {
@@ -24,6 +28,10 @@ func (r *RateLimiter) Add(region int, l Limit) {
 	r.timers[region] = l
 }
 
-func (r *RateLimiter) Take(region int) {
-	r.timers[region].Take()
+func (r *RateLimiter) MustGet(ctx context.Context, region int) error {
+	return r.timers[region].MustGet()
+}
+
+func (r *RateLimiter) Get(ctx context.Context, region int) error {
+	return r.timers[region].Get()
 }
