@@ -11,7 +11,8 @@ import (
 
 func main() {
 	opts := []glaw.Option{
-		glaw.WithRateLimiting(20, 100),
+		// glaw.WithRateLimiting(int, int, time.Duration)
+		glaw.WithDevSettings(),
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 

@@ -2,6 +2,7 @@ package glaw
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/coltiebaby/glaw/ratelimit"
 )
@@ -44,6 +45,10 @@ func (t RateLimitOption) apply(c *Client) (*Client, error) {
 	return c, nil
 }
 
-func WithRateLimiting(burst, max int) RateLimitOption {
-	return RateLimitOption{value: ratelimit.NewRateLimiter(burst, max)}
+func WithRateLimiting(burst, max int, dur time.Duration) RateLimitOption {
+	return RateLimitOption{value: ratelimit.NewRateLimiter(burst, max, dur)}
+}
+
+func WithDevSettings() RateLimitOption {
+	return WithRateLimiting(20, 100, time.Minute*2)
 }

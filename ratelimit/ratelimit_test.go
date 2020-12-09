@@ -10,7 +10,7 @@ func TestGet(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*250)
 	defer cancel()
 
-	limit := NewLimiter(10, 20)
+	limit := NewLimiter(10, 20, time.Minute)
 
 	var count int
 	var err error
@@ -37,7 +37,7 @@ func TestMustGet(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond*250)
 	defer cancel()
 
-	limit := NewLimiter(10, 20)
+	limit := NewLimiter(10, 20, time.Minute)
 
 	var count int
 	var err error
