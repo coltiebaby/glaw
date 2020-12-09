@@ -34,7 +34,21 @@ func NewClient(opts ...Option) (c *Client, err error) {
 	return c, err
 }
 
-func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
+func (c *Client) Verify(ctx context.Context, region Region) error {
+	if c.rl == nil {
+		return nil
+	}
+
+	return c.rl.MustGet(ctx, int(region))
+}
+
+func (c *Client) Do(ctx context.Context, riotReq Request) (resp *http.Response, err error) {
+	err = c.Verify(ctx, riotReq.Region)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := riotReq.NewHttpRequest(ctx)
 	req.Header.Add("X-Riot-Token", c.token)
 
 	resp, err = c.client.Do(req)
@@ -68,15 +82,8 @@ func (r Request) URL() string {
 }
 
 func (r Request) NewHttpRequest(ctx context.Context) (*http.Request, error) {
-	// return http.NewRequest(r.Method, r.URL(), r.Body)
 	return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
 }
-
-// func (r Request) NewHttpRequest() (*http.Request, error) {
-// 	ctx := context.Background()
-//
-// 	return r.NewHttpRequestWithCtx(ctx)
-// }
 
 type Version string
 

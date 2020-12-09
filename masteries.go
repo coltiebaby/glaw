@@ -23,12 +23,7 @@ func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score in
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequest(ctx)
-	if err != nil {
-		return score, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return score, err
 	}
@@ -55,12 +50,7 @@ func (c *Client) ChampionMasteries(ctx context.Context, mr MasteryRequest) (cm [
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequest(ctx)
-	if err != nil {
-		return cm, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return cm, err
 	}
@@ -88,12 +78,7 @@ func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequest(ctx)
-	if err != nil {
-		return cm, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return cm, err
 	}
