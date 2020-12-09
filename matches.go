@@ -23,7 +23,7 @@ func (c *Client) Match(ctx context.Context, mr MatchRequest) (matches MatchStora
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
+	r, err := req.NewHttpRequest(ctx)
 	if err != nil {
 		return matches, err
 	}
@@ -55,7 +55,7 @@ func (c *Client) Matches(ctx context.Context, mr MatchRequest) (matches MatchSto
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
+	r, err := req.NewHttpRequest(ctx)
 	if err != nil {
 		return matches, err
 	}
@@ -87,7 +87,7 @@ func (c *Client) Timeline(ctx context.Context, mr MatchRequest) (matches MatchSt
 		Uri:     mr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
+	r, err := req.NewHttpRequest(ctx)
 	if err != nil {
 		return matches, err
 	}

@@ -7,6 +7,7 @@ package ratelimit
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -25,7 +26,7 @@ type Limiter struct {
 func NewLimiter(burst, max int) *Limiter {
 	var e empty
 
-	limiter := &NewLimiter{
+	limiter := &Limiter{
 		Burst: burst,
 		Max:   max,
 		queue: make(chan empty, max),
@@ -73,8 +74,8 @@ func (limit *Limiter) fillBurst(ctx context.Context) {
 }
 
 func (limit *Limiter) fillQueue(ctx context.Context) {
-	ticker := time.NewTicker(time.Duration(max) / (120 * time.Second))
 	var e empty
+	ticker := time.NewTicker(time.Duration(limit.Max) / (120 * time.Second))
 
 	f := func() {
 		for {

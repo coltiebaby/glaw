@@ -17,7 +17,7 @@ func (c *Client) ChampionRotations(ctx context.Context, fcr ChampionRotationsReq
 		Uri:     `champion-rotations`,
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
+	r, err := req.NewHttpRequest(ctx)
 	if err != nil {
 		return ci, err
 	}
