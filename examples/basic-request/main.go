@@ -14,7 +14,7 @@ func main() {
 	defer cleanup()
 
 	opts := []glaw.Option{
-		glaw.WithRateLimiting(),
+		glaw.WithRateLimiting(20, 100),
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 

@@ -44,6 +44,6 @@ func (t RateLimitOption) apply(c *Client) (*Client, error) {
 	return c, nil
 }
 
-func WithRateLimiting() RateLimitOption {
-	return RateLimitOption{value: ratelimit.NewRateLimiter()}
+func WithRateLimiting(burst, max int) RateLimitOption {
+	return RateLimitOption{value: ratelimit.NewRateLimiter(burst, max)}
 }

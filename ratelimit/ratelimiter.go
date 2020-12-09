@@ -4,13 +4,17 @@ import (
 	"context"
 )
 
-func NewRateLimiter() *RateLimiter {
+func NewRateLimiter(burst, max int) *RateLimiter {
 	return &RateLimiter{
+        Burst: burst,
+        Max: max,
 		timers: make(map[int]*Limiter),
 	}
 }
 
 type RateLimiter struct {
+    Burst int
+    Max int
 	timers map[int]*Limiter
 }
 
@@ -23,7 +27,7 @@ func (r *RateLimiter) timer(region int) *Limiter {
 		return limiter
 	}
 
-	return NewLimiter(20, 100)
+	return NewLimiter(r.Burst, r.Max)
 }
 
 func (r *RateLimiter) MustGet(ctx context.Context, region int) error {
