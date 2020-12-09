@@ -36,12 +36,7 @@ func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner Sum
 		Uri:     sr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
-	if err != nil {
-		return summoner, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return summoner, err
 	}

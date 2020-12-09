@@ -25,12 +25,7 @@ func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league League, err
 		Uri:     qr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
-	if err != nil {
-		return league, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return league, err
 	}
@@ -57,12 +52,7 @@ func (c *Client) League(ctx context.Context, lr LeagueRequest) (league League, e
 		Uri:     lr.String(),
 	}
 
-	r, err := req.NewHttpRequestWithCtx(ctx)
-	if err != nil {
-		return league, err
-	}
-
-	resp, err := c.Do(r)
+	resp, err := c.Do(ctx, req)
 	if err != nil {
 		return league, err
 	}
