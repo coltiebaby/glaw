@@ -11,7 +11,10 @@ import (
 	"time"
 )
 
-const ResetDur time.Duration = time.Second * 2
+// Figures out the pace to fill the bucket.
+func rate(limit int, dur time.Duration) time.Duration {
+	return dur / time.Duration(limit)
+}
 
 type empty struct{}
 
@@ -20,13 +23,12 @@ type Limiter struct {
 	Max   int
 	Reset time.Duration
 
+	stop  chan empty
 	queue chan empty
 	burst chan empty
 }
 
 func NewLimiter(burst, max int, dur time.Duration) *Limiter {
-	var e empty
-
 	limiter := &Limiter{
 		Burst: burst,
 		Max:   max,
@@ -35,7 +37,12 @@ func NewLimiter(burst, max int, dur time.Duration) *Limiter {
 		burst: make(chan empty, burst),
 	}
 
-	for i := 0; i < max; i++ {
+	return limiter
+}
+
+func (limiter *Limiter) fill() {
+	var e empty
+	for i := 0; i < limiter.Max; i++ {
 		select {
 		case limiter.queue <- e:
 		default:
@@ -46,10 +53,10 @@ func NewLimiter(burst, max int, dur time.Duration) *Limiter {
 		default:
 		}
 	}
-
-	return limiter
 }
 
+// Fill burst fills the burst bucket every second. If you drain this you
+// have to wait for the queue bucket to refill.
 func (limit *Limiter) fillBurst(ctx context.Context) {
 	ticker := time.NewTicker(time.Second)
 
@@ -57,6 +64,8 @@ func (limit *Limiter) fillBurst(ctx context.Context) {
 		select {
 		case <-ticker.C:
 		case <-ctx.Done():
+			return
+		case <-limit.stop:
 			return
 		}
 
@@ -75,15 +84,18 @@ func (limit *Limiter) fillBurst(ctx context.Context) {
 	go f()
 }
 
+// Fill queue is the total amount of reqeusts you can make per X seconds
 func (limit *Limiter) fillQueue(ctx context.Context) {
-	var e empty
-	ticker := time.NewTicker(time.Duration(limit.Max) / limit.Reset)
+	ticker := time.NewTicker(rate(limit.Max, limit.Reset))
 
+	var e empty
 	f := func() {
 		for {
 			select {
 			case <-ticker.C:
 			case <-ctx.Done():
+				return
+			case <-limit.stop:
 				return
 			}
 
@@ -97,10 +109,11 @@ func (limit *Limiter) fillQueue(ctx context.Context) {
 	go f()
 }
 
+// Must Get will return an error if it cannot make a request or nil if it can
 func (limit *Limiter) MustGet(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return EmptyErr
+		return ctx.Err()
 	case <-limit.burst:
 		return nil
 	default:
@@ -109,21 +122,29 @@ func (limit *Limiter) MustGet(ctx context.Context) error {
 	return EmptyErr
 }
 
+// Get will wait until it can get a request or until the context is canceled
 func (limit *Limiter) Get(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return EmptyErr
+		return ctx.Err()
 	case <-limit.burst:
 		return nil
 	}
 }
 
-func (limit *Limiter) Fill(ctx context.Context) {
+// Starts the fill routine functions
+func (limit *Limiter) Start(ctx context.Context) {
+	limit.fill()
+
+	limit.stop = make(chan empty)
+
 	limit.fillQueue(ctx)
 	limit.fillBurst(ctx)
 }
 
+// Stops and cleans up the limiter
 func (limit *Limiter) Stop() {
+	close(limit.stop)
 	close(limit.queue)
 	close(limit.burst)
 }

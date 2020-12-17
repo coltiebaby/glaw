@@ -1,4 +1,4 @@
-package glaw
+package core
 
 const (
 	CHAMPION_KILL      string = "CHAMPION_KILL"

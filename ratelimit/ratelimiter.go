@@ -6,7 +6,11 @@ import (
 )
 
 func NewRateLimiter(burst, max int, dur time.Duration) *RateLimiter {
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &RateLimiter{
+		ctx:    ctx,
+		cancel: cancel,
 		Burst:  burst,
 		Max:    max,
 		Reset:  dur,
@@ -15,6 +19,9 @@ func NewRateLimiter(burst, max int, dur time.Duration) *RateLimiter {
 }
 
 type RateLimiter struct {
+	ctx    context.Context
+	cancel func()
+
 	Burst int
 	Max   int
 	Reset time.Duration
@@ -22,8 +29,8 @@ type RateLimiter struct {
 	timers map[int]*Limiter
 }
 
-func (r *RateLimiter) Add(region int, l *Limiter) {
-	r.timers[region] = l
+func (r *RateLimiter) Stop() {
+	r.cancel()
 }
 
 func (r *RateLimiter) timer(region int) *Limiter {
@@ -31,7 +38,11 @@ func (r *RateLimiter) timer(region int) *Limiter {
 		return limiter
 	}
 
-	return NewLimiter(r.Burst, r.Max, r.Reset)
+	limiter := NewLimiter(r.Burst, r.Max, r.Reset)
+	limiter.Start(r.ctx)
+	r.timers[region] = limiter
+
+	return limiter
 }
 
 func (r *RateLimiter) MustGet(ctx context.Context, region int) error {

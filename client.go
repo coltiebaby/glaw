@@ -3,12 +3,16 @@ package glaw
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
+	"time"
 
 	"github.com/coltiebaby/glaw/ratelimit"
 )
+
+type RiotRequest interface {
+	GetRegion() Region
+	NewHttpRequest(context.Context) (*http.Request, error)
+}
 
 type Client struct {
 	client *http.Client
@@ -34,7 +38,8 @@ func NewClient(opts ...Option) (c *Client, err error) {
 	return c, err
 }
 
-func (c *Client) Verify(ctx context.Context, region Region) error {
+// Wait will block until the either the ctx is done or a request is able to be sent
+func (c *Client) Wait(ctx context.Context, region Region) error {
 	if c.rl == nil {
 		return nil
 	}
@@ -42,47 +47,52 @@ func (c *Client) Verify(ctx context.Context, region Region) error {
 	return c.rl.MustGet(ctx, int(region))
 }
 
-func (c *Client) Do(ctx context.Context, riotReq Request) (resp *http.Response, err error) {
-	err = c.Verify(ctx, riotReq.Region)
-	if err != nil {
-		return nil, err
+// WaitN will block for X amount of seconds before returning an error. If the context is canceled
+// before the duration it will stop before then.
+func (c *Client) WaitN(ctx context.Context, region Region, n time.Duration) error {
+	if c.rl == nil {
+		return nil
 	}
 
+	done := make(chan bool)
+	timer := time.NewTimer(n)
+	defer timer.Stop()
+
+	go func() {
+		<-timer.C
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-done:
+			return ratelimit.EmptyErr
+		default:
+		}
+
+		if err := c.rl.Get(ctx, int(region)); err != ratelimit.EmptyErr {
+			break
+		}
+	}
+
+	return nil
+}
+
+func (c *Client) Do(ctx context.Context, riotReq RiotRequest, to interface{}) error {
 	req, err := riotReq.NewHttpRequest(ctx)
 	req.Header.Add("X-Riot-Token", c.token)
 
-	resp, err = c.client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
-		return resp, err
+		return err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		err = NewRequestError(resp)
+		return NewRequestError(resp)
 	}
 
-	return resp, err
-}
-
-func ProcessResponse(resp *http.Response, to interface{}) error {
-	defer resp.Body.Close()
 	return json.NewDecoder(resp.Body).Decode(to)
-}
-
-type Request struct {
-	Method  string
-	Domain  string
-	Version Version
-	Region  Region
-	Uri     string
-	Body    io.Reader
-}
-
-func (r Request) URL() string {
-	return fmt.Sprintf(partial, r.Region.Base(), r.Domain, r.Version, r.Uri)
-}
-
-func (r Request) NewHttpRequest(ctx context.Context) (*http.Request, error) {
-	return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
 }
 
 type Version string
@@ -91,5 +101,3 @@ const (
 	V3 Version = `v3`
 	V4 Version = `v4`
 )
-
-const partial = "https://%s/lol/%s/%s/%s"
