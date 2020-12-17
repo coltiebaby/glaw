@@ -15,11 +15,6 @@ func (c *Client) ChampionRotations(ctx context.Context, fcr ChampionRotationsReq
 	uri := `champion-rotations`
 	req := NewRequest("GET", "platform", uri, fcr.Region, glaw.V3)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return ci, err
-	}
-
-	err = glaw.ProcessResponse(resp, &ci)
+	err = c.Do(ctx, req, &ci)
 	return ci, err
 }

@@ -34,11 +34,6 @@ func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner cor
 	uri := sr.String()
 	req := NewRequest("GET", "summoner", uri, sr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return summoner, err
-	}
-
-	err = glaw.ProcessResponse(resp, &summoner)
+	err = c.Do(ctx, req, &summoner)
 	return summoner, err
 }

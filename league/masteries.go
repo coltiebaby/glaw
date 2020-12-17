@@ -21,12 +21,7 @@ func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score in
 	uri := mr.String()
 	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return score, err
-	}
-
-	err = glaw.ProcessResponse(resp, &score)
+	err = c.Do(ctx, req, &score)
 	return score, err
 }
 
@@ -43,12 +38,7 @@ func (c *Client) ChampionMasteries(ctx context.Context, mr MasteryRequest) (cm [
 	uri := mr.String()
 	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return cm, err
-	}
-
-	err = glaw.ProcessResponse(resp, &cm)
+	err = c.Do(ctx, req, &cm)
 	return cm, err
 }
 
@@ -66,11 +56,6 @@ func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (
 	uri := mr.String()
 	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return cm, err
-	}
-
-	err = glaw.ProcessResponse(resp, &cm)
+	err = c.Do(ctx, req, &cm)
 	return cm, err
 }

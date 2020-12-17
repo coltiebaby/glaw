@@ -23,12 +23,7 @@ func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league core.League
 	uri := qr.String()
 	req := NewRequest("GET", "league", uri, qr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return league, err
-	}
-
-	err = glaw.ProcessResponse(resp, &league)
+	err = c.Do(ctx, req, &league)
 	return league, err
 }
 
@@ -45,12 +40,7 @@ func (c *Client) League(ctx context.Context, lr LeagueRequest) (league core.Leag
 	uri := lr.String()
 	req := NewRequest("GET", "league", uri, lr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return league, err
-	}
-
-	err = glaw.ProcessResponse(resp, &league)
+	err = c.Do(ctx, req, &league)
 	return league, err
 }
 

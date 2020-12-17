@@ -25,9 +25,15 @@ func main() {
 		Region: glaw.REGION_NA,
 	}
 
+	err := client.Wait(ctx, req.Region)
+	if err != nil {
+		log.Fatalf("%s", err)
+	}
+
 	free, err := client.ChampionRotations(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
+
 	log.Printf("%+v\n", free)
 }

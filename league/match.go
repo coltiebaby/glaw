@@ -21,13 +21,9 @@ func (c *Client) Match(ctx context.Context, mr MatchRequest) (matches core.Match
 	uri := mr.String()
 	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return matches, err
-	}
-
-	err = glaw.ProcessResponse(resp, &matches)
+	err = c.Do(ctx, req, &matches)
 	return matches, err
+
 }
 
 type MatchesRequest struct {
@@ -43,12 +39,7 @@ func (c *Client) Matches(ctx context.Context, mr MatchRequest) (matches core.Mat
 	uri := mr.String()
 	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return matches, err
-	}
-
-	err = glaw.ProcessResponse(resp, &matches)
+	err = c.Do(ctx, req, &matches)
 	return matches, err
 }
 
@@ -65,11 +56,6 @@ func (c *Client) Timeline(ctx context.Context, mr MatchRequest) (matches core.Ma
 	uri := mr.String()
 	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
-	resp, err := c.Do(ctx, req)
-	if err != nil {
-		return matches, err
-	}
-
-	err = glaw.ProcessResponse(resp, &matches)
+	err = c.Do(ctx, req, &matches)
 	return matches, err
 }

@@ -1,9 +1,9 @@
 package league
 
 import (
-    "io"
-    "context"
+	"context"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/coltiebaby/glaw"

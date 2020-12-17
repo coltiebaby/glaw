@@ -100,7 +100,7 @@ func (limit *Limiter) fillQueue(ctx context.Context) {
 func (limit *Limiter) MustGet(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return EmptyErr
+		return ctx.Err()
 	case <-limit.burst:
 		return nil
 	default:
@@ -112,7 +112,7 @@ func (limit *Limiter) MustGet(ctx context.Context) error {
 func (limit *Limiter) Get(ctx context.Context) error {
 	select {
 	case <-ctx.Done():
-		return EmptyErr
+		return ctx.Err()
 	case <-limit.burst:
 		return nil
 	}
