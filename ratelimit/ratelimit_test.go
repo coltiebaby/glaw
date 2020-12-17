@@ -11,6 +11,7 @@ func TestGet(t *testing.T) {
 	defer cancel()
 
 	limit := NewLimiter(10, 20, time.Minute)
+	limit.fill()
 
 	var count int
 	var err error
@@ -24,8 +25,8 @@ func TestGet(t *testing.T) {
 		count++
 	}
 
-	if err != EmptyErr {
-		t.Fatalf("expected an empty err but got %s", EmptyErr)
+	if err != context.DeadlineExceeded {
+		t.Fatalf("expected an empty err but got %s", err)
 	}
 
 	if count != 10 {
@@ -38,6 +39,7 @@ func TestMustGet(t *testing.T) {
 	defer cancel()
 
 	limit := NewLimiter(10, 20, time.Minute)
+	limit.fill()
 
 	var count int
 	var err error
@@ -54,7 +56,7 @@ func TestMustGet(t *testing.T) {
 	err = limit.MustGet(ctx)
 
 	if err != EmptyErr {
-		t.Fatalf("expected an empty err but got %s", EmptyErr)
+		t.Fatalf("expected an empty err but got %s", err)
 	}
 
 	if count != 10 {
