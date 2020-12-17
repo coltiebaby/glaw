@@ -1,37 +1,40 @@
-package glaw
+package league
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/league/core"
 )
 
 type SummonerRequest struct {
 	Type   int
 	ID     string
-	Region Region
+	Region glaw.Region
 }
 
 func (sr SummonerRequest) String() string {
 	uri := sr.ID
 
 	switch sr.Type {
-	case SummonerID:
-	case SummonerName:
+	case core.SummonerID:
+	case core.SummonerName:
 		uri = fmt.Sprintf("by-name/%s", uri)
-	case SummonerPUUID:
+	case core.SummonerPUUID:
 		uri = fmt.Sprintf("by-puuid/%s", uri)
-	case SummonerAccountID:
+	case core.SummonerAccountID:
 		uri = fmt.Sprintf("by-account/%s", uri)
 	}
 
 	return uri
 }
 
-func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner Summoner, err error) {
-	req := Request{
+func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner core.Summoner, err error) {
+	req := glaw.Request{
 		Method:  `GET`,
 		Domain:  `summoner`,
-		Version: V4,
+		Version: glaw.V4,
 		Region:  sr.Region,
 		Uri:     sr.String(),
 	}
@@ -41,26 +44,6 @@ func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner Sum
 		return summoner, err
 	}
 
-	err = ProcessResponse(resp, &summoner)
+	err = glaw.ProcessResponse(resp, &summoner)
 	return summoner, err
 }
-
-type Summoner struct {
-	ID            string `json:"id"`
-	AccountID     string `json:"accountId"`
-	PUUID         string `json:"puuid"`
-	Name          string `json:"name"`
-	SummonerLevel int    `json:"summonerLevel"`
-	ProfileIconID int    `json:"profileIconId"`
-	// Date summoner was last modified specified as epoch milliseconds.
-	// The following events will update this timestamp: profile icon change,
-	// playing the tutorial or advanced tutorial, finishing a game, summoner name change
-	RevisionDate int64 `json:"revisionDate"`
-}
-
-const (
-	SummonerName = iota
-	SummonerID
-	SummonerAccountID
-	SummonerPUUID
-)
