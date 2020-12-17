@@ -5,7 +5,7 @@ A simple League of Legends api wrapper.
 ## Setup
 
 Register for the [Riot Api](https://developer.games.com/) to get a developer key.
-Set the environmental variable `RIOT_API_TOKEN` to your new key where ever you're going
+Set the environmental variable `LEAGUE_API_KEY` to your new key where ever you're going
 to run your stuff.
 
 ## Example
@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/league"
 )
 
 func main() {
@@ -31,15 +32,21 @@ func main() {
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 
-	client, _ := glaw.NewClient(opts...)
-	req := glaw.ChampionRotationsRequest{
+	client, _ := league.NewClient(opts...)
+	req := league.ChampionRotationsRequest{
 		Region: glaw.REGION_NA,
+	}
+
+	err := client.Wait(ctx, req.Region)
+	if err != nil {
+		log.Fatalf("%s", err)
 	}
 
 	free, err := client.ChampionRotations(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
+
 	log.Printf("%+v\n", free)
 }
 ```
@@ -54,12 +61,12 @@ func main() {
 - [v4] league
 - [v4] match
 - [v4] summoner
+- [v1] clash
 
 
 ## Not Covered
 
 ### League of Legends
-- clash-v1
 - tournament-stub-v4
 - tournament-v4
 - third-party-code-v4
