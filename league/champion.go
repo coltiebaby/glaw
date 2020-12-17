@@ -12,13 +12,8 @@ type ChampionRotationsRequest struct {
 }
 
 func (c *Client) ChampionRotations(ctx context.Context, fcr ChampionRotationsRequest) (ci core.ChampionInfo, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `platform`,
-		Version: glaw.V3,
-		Region:  fcr.Region,
-		Uri:     `champion-rotations`,
-	}
+	uri := `champion-rotations`
+	req := NewRequest("GET", "platform", uri, fcr.Region, glaw.V3)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {

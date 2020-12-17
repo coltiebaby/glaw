@@ -20,13 +20,8 @@ func (qr QueueRequest) String() string {
 }
 
 func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league core.League, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `league`,
-		Version: glaw.V4,
-		Region:  qr.Region,
-		Uri:     qr.String(),
-	}
+	uri := qr.String()
+	req := NewRequest("GET", "league", uri, qr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
@@ -47,13 +42,8 @@ func (lr LeagueRequest) String() string {
 }
 
 func (c *Client) League(ctx context.Context, lr LeagueRequest) (league core.League, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `league`,
-		Version: glaw.V4,
-		Region:  lr.Region,
-		Uri:     lr.String(),
-	}
+	uri := lr.String()
+	req := NewRequest("GET", "league", uri, lr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {

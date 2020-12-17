@@ -3,12 +3,15 @@ package glaw
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/coltiebaby/glaw/ratelimit"
 )
+
+type RiotRequest interface {
+	GetRegion() Region
+	NewHttpRequest(context.Context) (*http.Request, error)
+}
 
 type Client struct {
 	client *http.Client
@@ -42,8 +45,8 @@ func (c *Client) Verify(ctx context.Context, region Region) error {
 	return c.rl.MustGet(ctx, int(region))
 }
 
-func (c *Client) Do(ctx context.Context, riotReq Request) (resp *http.Response, err error) {
-	err = c.Verify(ctx, riotReq.Region)
+func (c *Client) Do(ctx context.Context, riotReq RiotRequest) (resp *http.Response, err error) {
+	err = c.Verify(ctx, riotReq.GetRegion())
 	if err != nil {
 		return nil, err
 	}
@@ -68,28 +71,9 @@ func ProcessResponse(resp *http.Response, to interface{}) error {
 	return json.NewDecoder(resp.Body).Decode(to)
 }
 
-type Request struct {
-	Method  string
-	Domain  string
-	Version Version
-	Region  Region
-	Uri     string
-	Body    io.Reader
-}
-
-func (r Request) URL() string {
-	return fmt.Sprintf(partial, r.Region.Base(), r.Domain, r.Version, r.Uri)
-}
-
-func (r Request) NewHttpRequest(ctx context.Context) (*http.Request, error) {
-	return http.NewRequestWithContext(ctx, r.Method, r.URL(), r.Body)
-}
-
 type Version string
 
 const (
 	V3 Version = `v3`
 	V4 Version = `v4`
 )
-
-const partial = "https://%s/lol/%s/%s/%s"

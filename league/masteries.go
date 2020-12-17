@@ -18,13 +18,8 @@ func (sr ScoreRequest) String() string {
 }
 
 func (c *Client) ChampionScore(ctx context.Context, mr MasteryRequest) (score int, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `champion-mastery`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
@@ -45,13 +40,8 @@ func (mr MasteryRequest) String() string {
 }
 
 func (c *Client) ChampionMasteries(ctx context.Context, mr MasteryRequest) (cm []core.ChampionMastery, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `champion-mastery`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
@@ -73,13 +63,8 @@ func (mr MasteriesRequest) String() string {
 }
 
 func (c *Client) MasteriesByChampionId(ctx context.Context, mr MasteryRequest) (cm core.ChampionMastery, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `champion-mastery`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "champion-mastery", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {

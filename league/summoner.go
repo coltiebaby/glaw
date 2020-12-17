@@ -31,13 +31,8 @@ func (sr SummonerRequest) String() string {
 }
 
 func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner core.Summoner, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `summoner`,
-		Version: glaw.V4,
-		Region:  sr.Region,
-		Uri:     sr.String(),
-	}
+	uri := sr.String()
+	req := NewRequest("GET", "summoner", uri, sr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {

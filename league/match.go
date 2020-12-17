@@ -18,13 +18,8 @@ func (mr MatchRequest) String() string {
 }
 
 func (c *Client) Match(ctx context.Context, mr MatchRequest) (matches core.MatchStorage, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `match`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
@@ -45,13 +40,8 @@ func (mr MatchesRequest) String() string {
 }
 
 func (c *Client) Matches(ctx context.Context, mr MatchRequest) (matches core.MatchStorage, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `match`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
@@ -72,13 +62,8 @@ func (tr TimelineRequest) String() string {
 }
 
 func (c *Client) Timeline(ctx context.Context, mr MatchRequest) (matches core.MatchStorage, err error) {
-	req := glaw.Request{
-		Method:  `GET`,
-		Domain:  `match`,
-		Version: glaw.V4,
-		Region:  mr.Region,
-		Uri:     mr.String(),
-	}
+	uri := mr.String()
+	req := NewRequest("GET", "match", uri, mr.Region, glaw.V4)
 
 	resp, err := c.Do(ctx, req)
 	if err != nil {
