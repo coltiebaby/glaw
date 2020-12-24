@@ -23,7 +23,7 @@ func main() {
 
 	client, _ := league.NewClient(opts...)
 
-	req := league.ProviderRequest{
+	req := league.TournamentProviderRequest{
 		Region: glaw.REGION_AMERICAS,
 		Registration: core.TournamentProviderRegistration{
 			Url:    "http://test.com:80/callback",
