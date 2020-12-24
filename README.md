@@ -58,10 +58,12 @@ func main() {
 ### League Of Legends
 - [v4] champion-mastery
 - [v3] champion (free-champion-rotation)
+- [v1] clash
 - [v4] league
+- [v4] league-exp
 - [v4] match
 - [v4] summoner
-- [v1] clash
+- [v4] status
 
 
 ## Not Covered
@@ -71,8 +73,6 @@ func main() {
 - tournament-v4
 - third-party-code-v4
 - spectator-v4
-- lol-status-v4
-- league-exp-v4
 
 ### Runeterra
 - account-v1
