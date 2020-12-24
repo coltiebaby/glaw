@@ -63,8 +63,9 @@ type EntryRequest struct {
 	SummonerId string
 	Queue      core.Queue
 	Tier       core.Tier
-	Division   core.Divsion
+	Division   core.Division
 	Region     glaw.Region
+	Page       int
 }
 
 func (er EntryRequest) String() string {
@@ -72,7 +73,12 @@ func (er EntryRequest) String() string {
 		return fmt.Sprintf(`entries/by-summoner/%s`, er.SummonerId)
 	}
 
-	return fmt.Sprintf(`entries/%s/%s/%s`, er.Queue, er.Tier, er.Divison)
+	template := `entries/%s/%s/%s`
+	if er.Page > 1 {
+		template = fmt.Sprintf("%s?page=%d", template, er.Page)
+	}
+
+	return fmt.Sprintf(template, er.Queue, er.Tier, er.Division)
 }
 
 // Entry will grab a slice of entries. Uses the experimental api if you use challenger, master, or
@@ -81,7 +87,7 @@ func (c *Client) Entry(ctx context.Context, er EntryRequest) (entries []core.Lea
 	uri := er.String()
 	var req Request
 
-	switch qr.Tier {
+	switch er.Tier {
 	case core.CHALLENGER, core.MASTER, core.GRANDMASTER:
 		req = NewRequest("GET", "league-exp", uri, er.Region, glaw.V4)
 	default:
@@ -92,33 +98,34 @@ func (c *Client) Entry(ctx context.Context, er EntryRequest) (entries []core.Lea
 	return entries, err
 }
 
-// EntriesFactory builds out a closer to make it easier to get multiple pages
-// You'll have to manually check if there's anymore pages
-//
-//  f := EntriesFactory(leagues.SOLO, leagues.GOLD, leagues.ONE)
-//  for {
-//       page := 1
-//       if results, err := f(page); err != nil {
-//            if len(results) == 0 {
-//                 break
-//            }
-//            // ...do something with results
-//       }
-//       page = page + 1
-//  }
-// func EntriesFactory(c glaw.ApiClient, queue Queue, tier Tier, division Division) func(int) ([]LeagueEntry, error) {
-// 	uri := fmt.Sprintf(`entries/%s/%s/%s`, queue, tier, division)
-// 	return func(page int) ([]LeagueEntry, error) {
-// 		return Entries(c, uri, page)
-// 	}
-// }
-//
-// func Entries(c glaw.ApiClient, uri string, page int) (entries []LeagueEntry, err error) {
-// 	entries, err = getEntries(c, uri, page)
-// 	return entries, err
-// }
-//
-// func EntriesBySummonerID(c glaw.ApiClient, id string) (entries []LeagueEntry, err error) {
-// 	entries, err = getEntries(c, fmt.Sprintf(`entries/by-summoner/%s`, id), -1)
-// 	return entries, err
-// }
+type EntryFetcher struct {
+	client  *Client
+	Request EntryRequest
+	stop    bool
+}
+
+func NewEntryFetcher(c *Client, req EntryRequest) *EntryFetcher {
+	req.Page = 1
+	return &EntryFetcher{
+		client:  c,
+		Request: req,
+	}
+}
+
+func (ef *EntryFetcher) Next(ctx context.Context) (entries []core.LeagueEntry, err error) {
+	if ef.stop {
+		return entries, NoEntriesErr
+	}
+
+	ef.Request.Page++
+	entries, err = ef.client.Entry(ctx, ef.Request)
+
+	if len(entries) == 0 {
+		ef.stop = true
+		err = NoEntriesErr
+	}
+
+	return entries, err
+}
+
+var NoEntriesErr error = fmt.Errorf("no more entries")
