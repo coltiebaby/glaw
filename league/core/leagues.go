@@ -3,12 +3,6 @@ package core
 type Queue string
 
 const (
-	Challenger  = `challenger`
-	Master      = `master`
-	GrandMaster = `grandmaster`
-)
-
-const (
 	FLEX               Queue = `RANKED_FLEX`
 	SOLO               Queue = `RANKED_SOLO_5x5`
 	TEAM_FIGHT_TACTICS Queue = `RANKED_FLEX_TFT`
@@ -18,13 +12,15 @@ const (
 type Tier string
 
 const (
-	// CHALLENGER Tier = "CHALLENGER"
-	DIAMOND  Tier = `DIAMOND`
-	PLATINUM Tier = `PLATINUM`
-	GOLD     Tier = `GOLD`
-	SILVER   Tier = `SILVER`
-	BRONZE   Tier = `BRONZE`
-	IRON     Tier = `IRON`
+	CHALLENGER  Tier = `CHALLENGER`
+	MASTER      Tier = `MASTER`
+	GRANDMASTER Tier = `GRANDMASTER`
+	DIAMOND     Tier = `DIAMOND`
+	PLATINUM    Tier = `PLATINUM`
+	GOLD        Tier = `GOLD`
+	SILVER      Tier = `SILVER`
+	BRONZE      Tier = `BRONZE`
+	IRON        Tier = `IRON`
 )
 
 type Division string
