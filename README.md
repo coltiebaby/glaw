@@ -64,6 +64,7 @@ func main() {
 - [v4] match
 - [v4] summoner
 - [v4] status
+- [v4] third-party-code
 
 
 ## Not Covered
@@ -71,7 +72,6 @@ func main() {
 ### League of Legends
 - tournament-stub-v4
 - tournament-v4
-- third-party-code-v4
 - spectator-v4
 
 ### Runeterra
