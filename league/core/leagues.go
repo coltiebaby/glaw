@@ -1,5 +1,30 @@
 package core
 
+type Spectator string
+
+const (
+	NONE      Spectator = "NONE"
+	LOBBYONLY Spectator = "LOBBYONLY"
+	ALL       Spectator = "ALL"
+)
+
+type Map string
+
+const (
+	SUMMONERS_RIFT   Map = "SUMMONERS_RIFT"
+	TWISTED_TREELINE Map = "TWISTED_TREELINE"
+	HOWLING_ABYSS    Map = "HOWLING_ABYSS"
+)
+
+type GameType string
+
+const (
+	BLIND_PICK       GameType = "BLIND_PICK"
+	DRAFT_MODE       GameType = "DRAFT_MODE"
+	ALL_RANDOM       GameType = "ALL_RANDOM"
+	TOURNAMENT_DRAFT GameType = "TOURNAMENT_DRAFT"
+)
+
 type Queue string
 
 const (

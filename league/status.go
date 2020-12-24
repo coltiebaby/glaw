@@ -2,7 +2,6 @@ package league
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/league/core"
