@@ -1,12 +1,31 @@
 package core
 
-type Queue string
+type Spectator string
 
 const (
-	Challenger  = `challenger`
-	Master      = `master`
-	GrandMaster = `grandmaster`
+	NONE      Spectator = "NONE"
+	LOBBYONLY Spectator = "LOBBYONLY"
+	ALL       Spectator = "ALL"
 )
+
+type Map string
+
+const (
+	SUMMONERS_RIFT Map = "SUMMONERS_RIFT"
+	TREELINE       Map = "TWISTED_TREELINE"
+	HOWLING_ABYSS  Map = "HOWLING_ABYSS"
+)
+
+type GameType string
+
+const (
+	BLIND_PICK       GameType = "BLIND_PICK"
+	DRAFT_MODE       GameType = "DRAFT_MODE"
+	ALL_RANDOM       GameType = "ALL_RANDOM"
+	TOURNAMENT_DRAFT GameType = "TOURNAMENT_DRAFT"
+)
+
+type Queue string
 
 const (
 	FLEX               Queue = `RANKED_FLEX`
@@ -18,13 +37,15 @@ const (
 type Tier string
 
 const (
-	// CHALLENGER Tier = "CHALLENGER"
-	DIAMOND  Tier = `DIAMOND`
-	PLATINUM Tier = `PLATINUM`
-	GOLD     Tier = `GOLD`
-	SILVER   Tier = `SILVER`
-	BRONZE   Tier = `BRONZE`
-	IRON     Tier = `IRON`
+	CHALLENGER  Tier = `CHALLENGER`
+	MASTER      Tier = `MASTER`
+	GRANDMASTER Tier = `GRANDMASTER`
+	DIAMOND     Tier = `DIAMOND`
+	PLATINUM    Tier = `PLATINUM`
+	GOLD        Tier = `GOLD`
+	SILVER      Tier = `SILVER`
+	BRONZE      Tier = `BRONZE`
+	IRON        Tier = `IRON`
 )
 
 type Division string

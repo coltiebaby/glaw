@@ -81,6 +81,9 @@ type ParticipantTimeline struct {
 
 type Participant struct {
 	Timeline                  ParticipantTimeline `json:"timeline"`
+	Bot                       bool                `json:"bot"`
+	GameCustomizationObjects  []interface{}       `json:"gameCustomizationObjects"`
+	Perks                     Perk                `json:"perks"`
 	Spell1ID                  int                 `json:"spell1Id"`
 	ParticipantID             int                 `json:"participantId"`
 	Spell2ID                  int                 `json:"spell2Id"`
@@ -88,6 +91,9 @@ type Participant struct {
 	Stats                     Stat                `json:"stats"`
 	ChampionID                int                 `json:"championId"`
 	HighestAchievedSeasonTier string              `json:"highestAchievedSeasonTier,omitempty"`
+	ProfileIconID             int                 `json:"profileIconId"`
+	SummonerName              string              `json:"summonerName"`
+	SummonerID                string              `json:"summonerId"`
 }
 
 type Stat struct {
@@ -220,6 +226,18 @@ type Player struct {
 	ProfileIcon       int    `json:"profileIcon"`
 	SummonerID        string `json:"summonerId"`
 	AccountID         string `json:"accountId"`
+}
+
+type Perk struct {
+	PerkIds      []int `json:"perkIds"`
+	PerkStyle    int   `json:"perkStyle"`
+	PerkSubStyle int   `json:"perkSubStyle"`
+}
+
+type Banned struct {
+	ChampionID int `json:"championId"`
+	TeamID     int `json:"teamId"`
+	PickTurn   int `json:"pickTurn"`
 }
 
 type ParticipantID struct {
