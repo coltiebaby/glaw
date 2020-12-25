@@ -67,13 +67,11 @@ func main() {
 - [v4] third-party-code
 - [v4] tournament-stub
 - [v4] tournament
+- [v4] spectator
 
 
 
 ## Not Covered
-
-### League of Legends
-- spectator-v4
 
 ### Runeterra
 - account-v1
