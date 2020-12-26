@@ -10,17 +10,17 @@ import (
 )
 
 type Client struct {
-	client *glaw.Client
+	client *league.Client
 }
 
-func New(c *glaw.Client) *Client {
+func New(c *league.Client) *Client {
 	return &Client{
 		client: c,
 	}
 }
 
 func NewClashClient(opts ...glaw.Option) (*Client, error) {
-	c, err := glaw.NewClient(opts...)
+	c, err := league.NewClient(opts...)
 	client := &Client{
 		client: c,
 	}
@@ -50,7 +50,7 @@ func (c *Client) GetRegistration(ctx context.Context, crr RegistrationRequest) (
 	uri := fmt.Sprintf("players/by-summoner/%s", id)
 	req := league.NewRequest("GET", "clash", uri, crr.Region, glaw.V1)
 
-	err = c.Do(ctx, req, &cp)
+	err = c.client.Do(ctx, req, &cp)
 	return cp, err
 }
 
@@ -67,7 +67,7 @@ func (c *Client) GetTeam(ctx context.Context, ctr TeamRequest) (ct []core.ClashT
 	uri := `teams`
 	req := league.NewRequest("GET", "clash", uri, ctr.Region, glaw.V1)
 
-	err = c.Do(ctx, req, &ct)
+	err = c.client.Do(ctx, req, &ct)
 	return ct, err
 }
 
@@ -83,7 +83,7 @@ func (c *Client) GetTournaments(ctx context.Context, ctr TournamentsRequest) (ct
 	uri := `tournaments`
 	req := league.NewRequest("GET", "clash", uri, ctr.Region, glaw.V1)
 
-	err = c.Do(ctx, req, &ct)
+	err = c.client.Do(ctx, req, &ct)
 	return ct, err
 }
 
@@ -111,6 +111,6 @@ func (c *Client) GetTournament(ctx context.Context, ctr TournamentRequest) (ct [
 	}
 
 	req := league.NewRequest("GET", "clash", uri, ctr.Region, glaw.V1)
-	err = c.Do(ctx, req, &ct)
+	err = c.client.Do(ctx, req, &ct)
 	return ct, err
 }

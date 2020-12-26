@@ -43,19 +43,19 @@ func (qr QueueRequest) String() string {
 	return fmt.Sprintf(template, qr.Tier, qr.Queue)
 }
 
-func (c *Client) GetQueue(ctx context.Context, qr QueueRequest) (league core.League, err error) {
+func (c *Client) GetQueue(ctx context.Context, qr QueueRequest) (l core.League, err error) {
 	switch qr.Tier {
 	case core.CHALLENGER, core.MASTER, core.GRANDMASTER:
 	default:
 		err = fmt.Errorf("tier must be challenger, master, or grandmaster")
-		return league, err
+		return l, err
 	}
 
 	uri := qr.String()
 	req := league.NewRequest("GET", "league", uri, qr.Region, glaw.V4)
 
-	err = c.client.Do(ctx, req, &league)
-	return league, err
+	err = c.client.Do(ctx, req, &l)
+	return l, err
 }
 
 // League
@@ -68,15 +68,15 @@ type LeagueRequest struct {
 }
 
 func (lr LeagueRequest) String() string {
-	return fmt.Sprintf(`leagues/%s`, lr.ID)
+	return fmt.Sprintf(`leagues/%s`, lr.Id)
 }
 
-func (c *Client) GetLeague(ctx context.Context, lr LeagueRequest) (league core.League, err error) {
+func (c *Client) GetLeague(ctx context.Context, lr LeagueRequest) (l core.League, err error) {
 	uri := lr.String()
 	req := league.NewRequest("GET", "league", uri, lr.Region, glaw.V4)
 
-	err = c.client.Do(ctx, req, &league)
-	return league, err
+	err = c.client.Do(ctx, req, &l)
+	return l, err
 }
 
 // Entry
@@ -109,7 +109,7 @@ func (er EntryRequest) String() string {
 // grandmaster.
 func (c *Client) GetEntry(ctx context.Context, er EntryRequest) (entries []core.LeagueEntry, err error) {
 	uri := er.String()
-	var req Request
+	var req league.Request
 
 	switch er.Tier {
 	case core.CHALLENGER, core.MASTER, core.GRANDMASTER:
@@ -142,7 +142,7 @@ func (ef *EntryFetcher) Next(ctx context.Context) (entries []core.LeagueEntry, e
 	}
 
 	ef.Request.Page++
-	entries, err = ef.client.Entry(ctx, ef.Request)
+	entries, err = ef.client.GetEntry(ctx, ef.Request)
 
 	if len(entries) == 0 {
 		ef.stop = true

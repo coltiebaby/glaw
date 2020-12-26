@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/coltiebaby/glaw"
-	"github.com/coltiebaby/glaw/league"
+	"github.com/coltiebaby/glaw/api"
 	"github.com/coltiebaby/glaw/league/core"
 	"github.com/coltiebaby/glaw/league/tournament"
 )
@@ -22,8 +22,7 @@ func main() {
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 
-	client, _ := league.NewClient(opts...)
-	c := tournament.New(client)
+	client, _ := api.NewLeagueOfLegends(opts...)
 
 	req := tournament.ProviderRequest{
 		Region: glaw.REGION_AMERICAS,
@@ -33,12 +32,7 @@ func main() {
 		},
 	}
 
-	err := client.Wait(ctx, req.Region)
-	if err != nil {
-		log.Fatalf("%s", err)
-	}
-
-	providerId, err := c.GetProvider(ctx, req)
+	providerId, err := client.Tournament.GetProvider(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}

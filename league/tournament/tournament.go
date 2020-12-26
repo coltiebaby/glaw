@@ -15,8 +15,8 @@ import (
 )
 
 type Client struct {
-	client  *league.Client
-	Enabled bool
+	client    *league.Client
+	IsEnabled bool
 }
 
 func New(c *league.Client) *Client {
@@ -34,6 +34,14 @@ func NewTournamentClient(opts ...glaw.Option) (*Client, error) {
 	return client, err
 }
 
+func (c *Client) getDomain() string {
+	if c.IsEnabled {
+		return "tournament"
+	}
+
+	return "tournament-stub"
+}
+
 type ProviderRequest struct {
 	Region       glaw.Region
 	Registration core.TournamentProviderRegistration
@@ -41,7 +49,7 @@ type ProviderRequest struct {
 
 func (c *Client) GetProvider(ctx context.Context, pr ProviderRequest) (id int, err error) {
 	uri := `providers`
-	req := league.NewRequest("POST", "tournament-stub", uri, pr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, pr.Region, glaw.V4)
 
 	b, err := json.Marshal(pr.Registration)
 	if err != nil {
@@ -62,7 +70,7 @@ type CreateRequest struct {
 
 func (c *Client) Create(ctx context.Context, tr CreateRequest) (id int, err error) {
 	uri := `tournaments`
-	req := league.NewRequest("POST", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	b, err := json.Marshal(tr.Registration)
 	if err != nil {
@@ -89,7 +97,7 @@ func (c *Client) CreateCode(ctx context.Context, tr CodeRequest) (codes []string
 	}
 
 	uri := `codes`
-	req := league.NewRequest("POST", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	b, err := json.Marshal(tr.Registration)
 	if err != nil {
@@ -130,7 +138,7 @@ type LobbyEventRequest struct {
 
 func (c *Client) GetLobbyEvents(ctx context.Context, tr LobbyEventRequest) (events []core.TournamentEvent, err error) {
 	uri := fmt.Sprintf(`lobby-events/by-code/%s`, tr.Code)
-	req := league.NewRequest("GET", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("GET", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	var e core.TournamentEvents
 	err = c.client.Do(ctx, req, &e)

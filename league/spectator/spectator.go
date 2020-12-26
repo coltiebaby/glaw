@@ -10,17 +10,17 @@ import (
 )
 
 type Client struct {
-	client *glaw.Client
+	client *league.Client
 }
 
-func New(c *glaw.Client) *Client {
+func New(c *league.Client) *Client {
 	return &Client{
 		client: c,
 	}
 }
 
 func NewSpectatorClient(opts ...glaw.Option) (*Client, error) {
-	c, err := glaw.NewClient(opts...)
+	c, err := league.NewClient(opts...)
 	client := &Client{
 		client: c,
 	}
@@ -41,7 +41,7 @@ func (c *Client) GetActiveGame(ctx context.Context, agr ActiveGameRequest) (game
 	uri := fmt.Sprintf(`active-games/by-summoner/%s`, agr.SummonerId)
 	req := league.NewRequest("GET", "spectator", uri, agr.Region, glaw.V4)
 
-	err = c.Do(ctx, req, &game)
+	err = c.client.Do(ctx, req, &game)
 	return game, err
 }
 
@@ -57,6 +57,6 @@ func (c *Client) GetFeaturedGames(ctx context.Context, fgr FeaturedGamesRequest)
 	uri := `featured-games`
 	req := league.NewRequest("GET", "spectator", uri, fgr.Region, glaw.V4)
 
-	err = c.Do(ctx, req, &game)
+	err = c.client.Do(ctx, req, &game)
 	return game, err
 }
