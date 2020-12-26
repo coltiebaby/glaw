@@ -9,6 +9,7 @@ import (
 	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/league"
 	"github.com/coltiebaby/glaw/league/core"
+	"github.com/coltiebaby/glaw/league/tournament"
 )
 
 func main() {
@@ -22,8 +23,9 @@ func main() {
 	}
 
 	client, _ := league.NewClient(opts...)
+	c := tournament.New(client)
 
-	req := league.TournamentProviderRequest{
+	req := tournament.ProviderRequest{
 		Region: glaw.REGION_AMERICAS,
 		Registration: core.TournamentProviderRegistration{
 			Url:    "http://test.com:80/callback",
@@ -36,10 +38,10 @@ func main() {
 		log.Fatalf("%s", err)
 	}
 
-	free, err := client.Provider(ctx, req)
+	providerId, err := c.GetProvider(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
 
-	log.Printf("%+v\n", free)
+	log.Printf("created a new provider: %+v\n", providerId)
 }

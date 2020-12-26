@@ -1,12 +1,32 @@
-package league
+package summoner
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/league"
 	"github.com/coltiebaby/glaw/league/core"
 )
+
+type Client struct {
+	client *league.Client
+}
+
+func New(c *league.Client) *Client {
+	return &Client{
+		client: c,
+	}
+}
+
+func NewSummonerClient(opts ...glaw.Option) (*Client, error) {
+	c, err := league.NewClient(opts...)
+	client := &Client{
+		client: c,
+	}
+
+	return client, err
+}
 
 type SummonerRequest struct {
 	Type   int
@@ -30,10 +50,10 @@ func (sr SummonerRequest) String() string {
 	return uri
 }
 
-func (c *Client) Summoner(ctx context.Context, sr SummonerRequest) (summoner core.Summoner, err error) {
+func (c *Client) Get(ctx context.Context, sr SummonerRequest) (summoner core.Summoner, err error) {
 	uri := sr.String()
-	req := NewRequest("GET", "summoner", uri, sr.Region, glaw.V4)
+	req := league.NewRequest("GET", "summoner", uri, sr.Region, glaw.V4)
 
-	err = c.Do(ctx, req, &summoner)
+	err = c.client.Do(ctx, req, &summoner)
 	return summoner, err
 }

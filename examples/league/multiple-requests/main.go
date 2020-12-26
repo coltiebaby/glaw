@@ -14,10 +14,11 @@ import (
 
 	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/league"
+	"github.com/coltiebaby/glaw/league/champion"
 )
 
-func user(ctx context.Context, client *league.Client, number int, start <-chan bool) {
-	req := league.ChampionRotationsRequest{
+func user(ctx context.Context, client *champion.Client, number int, start <-chan bool) {
+	req := champion.FreeRotationRequest{
 		Region: glaw.REGION_NA,
 	}
 
@@ -28,7 +29,7 @@ func user(ctx context.Context, client *league.Client, number int, start <-chan b
 		return
 	}
 
-	free, err := client.ChampionRotations(ctx, req)
+	free, err := client.GetFreeRotation(ctx, req)
 	if err != nil {
 		log.Printf("worker %d: %s", number, err)
 		return
@@ -45,6 +46,7 @@ func main() {
 	}
 
 	client, _ := league.NewClient(opts...)
+	c := champion.New(client)
 
 	start := make(chan bool)
 
@@ -52,7 +54,7 @@ func main() {
 	defer cleanup()
 
 	for i := 1; i < 31; i++ {
-		go user(ctx, client, i, start)
+		go user(ctx, c, i, start)
 	}
 
 	close(start)

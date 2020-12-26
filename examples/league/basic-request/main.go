@@ -8,6 +8,7 @@ import (
 
 	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/league"
+	"github.com/coltiebaby/glaw/league/champion"
 )
 
 func main() {
@@ -21,7 +22,8 @@ func main() {
 	}
 
 	client, _ := league.NewClient(opts...)
-	req := league.ChampionRotationsRequest{
+	c := champion.New(client)
+	req := champion.FreeRotationRequest{
 		Region: glaw.REGION_NA,
 	}
 
@@ -30,7 +32,7 @@ func main() {
 		log.Fatalf("%s", err)
 	}
 
-	free, err := client.ChampionRotations(ctx, req)
+	free, err := c.GetFreeRotation(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
