@@ -82,12 +82,16 @@ func (c *Client) Do(ctx context.Context, riotReq RiotRequest, to interface{}) er
 	req, err := riotReq.NewHttpRequest(ctx)
 	req.Header.Add("X-Riot-Token", c.token)
 
+	if err = c.Wait(ctx, riotReq.GetRegion()); err != nil {
+		return err
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
+	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		return NewRequestError(resp)
 	}

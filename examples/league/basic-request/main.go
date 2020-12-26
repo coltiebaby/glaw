@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"github.com/coltiebaby/glaw"
-	"github.com/coltiebaby/glaw/league"
+	"github.com/coltiebaby/glaw/api"
+	"github.com/coltiebaby/glaw/league/champion"
 )
 
 func main() {
@@ -20,17 +21,12 @@ func main() {
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 
-	client, _ := league.NewClient(opts...)
-	req := league.ChampionRotationsRequest{
+	client, _ := api.NewLeagueOfLegends(opts...)
+	req := champion.FreeRotationRequest{
 		Region: glaw.REGION_NA,
 	}
 
-	err := client.Wait(ctx, req.Region)
-	if err != nil {
-		log.Fatalf("%s", err)
-	}
-
-	free, err := client.ChampionRotations(ctx, req)
+	free, err := client.Champion.GetFreeRotation(ctx, req)
 	if err != nil {
 		log.Fatalf("%s", err)
 	}

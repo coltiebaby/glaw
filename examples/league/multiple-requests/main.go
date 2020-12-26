@@ -13,22 +13,18 @@ import (
 	"time"
 
 	"github.com/coltiebaby/glaw"
-	"github.com/coltiebaby/glaw/league"
+	"github.com/coltiebaby/glaw/api"
+	"github.com/coltiebaby/glaw/league/champion"
 )
 
-func user(ctx context.Context, client *league.Client, number int, start <-chan bool) {
-	req := league.ChampionRotationsRequest{
+func user(ctx context.Context, client *champion.Client, number int, start <-chan bool) {
+	req := champion.FreeRotationRequest{
 		Region: glaw.REGION_NA,
 	}
 
 	<-start
-	err := client.Wait(ctx, req.Region)
-	if err != nil {
-		log.Printf("worker %d: %s", number, err)
-		return
-	}
 
-	free, err := client.ChampionRotations(ctx, req)
+	free, err := client.GetFreeRotation(ctx, req)
 	if err != nil {
 		log.Printf("worker %d: %s", number, err)
 		return
@@ -44,7 +40,7 @@ func main() {
 		glaw.WithAPIToken(os.Getenv("LEAGUE_API_KEY")),
 	}
 
-	client, _ := league.NewClient(opts...)
+	client, _ := api.NewLeagueOfLegends(opts...)
 
 	start := make(chan bool)
 
@@ -52,7 +48,7 @@ func main() {
 	defer cleanup()
 
 	for i := 1; i < 31; i++ {
-		go user(ctx, client, i, start)
+		go user(ctx, client.Champion, i, start)
 	}
 
 	close(start)

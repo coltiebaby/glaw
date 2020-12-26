@@ -1,14 +1,36 @@
-package league
+package rank
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/league"
 	"github.com/coltiebaby/glaw/league/core"
 )
 
+type Client struct {
+	client *league.Client
+}
+
+func New(c *league.Client) *Client {
+	return &Client{
+		client: c,
+	}
+}
+
+func NewRankClient(opts ...glaw.Option) (*Client, error) {
+	c, err := league.NewClient(opts...)
+	client := &Client{
+		client: c,
+	}
+
+	return client, err
+}
+
 // Queue
+//
+// View the top tier players and rankings (challenger, master, grandmaster)
 
 type QueueRequest struct {
 	Tier   core.Tier
@@ -21,38 +43,40 @@ func (qr QueueRequest) String() string {
 	return fmt.Sprintf(template, qr.Tier, qr.Queue)
 }
 
-func (c *Client) Queue(ctx context.Context, qr QueueRequest) (league core.League, err error) {
+func (c *Client) GetQueue(ctx context.Context, qr QueueRequest) (l core.League, err error) {
 	switch qr.Tier {
 	case core.CHALLENGER, core.MASTER, core.GRANDMASTER:
 	default:
 		err = fmt.Errorf("tier must be challenger, master, or grandmaster")
-		return league, err
+		return l, err
 	}
 
 	uri := qr.String()
-	req := NewRequest("GET", "league", uri, qr.Region, glaw.V4)
+	req := league.NewRequest("GET", "league", uri, qr.Region, glaw.V4)
 
-	err = c.Do(ctx, req, &league)
-	return league, err
+	err = c.client.Do(ctx, req, &l)
+	return l, err
 }
 
 // League
+//
+//
 
 type LeagueRequest struct {
-	ID     string
+	Id     string
 	Region glaw.Region
 }
 
 func (lr LeagueRequest) String() string {
-	return fmt.Sprintf(`leagues/%s`, lr.ID)
+	return fmt.Sprintf(`leagues/%s`, lr.Id)
 }
 
-func (c *Client) League(ctx context.Context, lr LeagueRequest) (league core.League, err error) {
+func (c *Client) GetLeague(ctx context.Context, lr LeagueRequest) (l core.League, err error) {
 	uri := lr.String()
-	req := NewRequest("GET", "league", uri, lr.Region, glaw.V4)
+	req := league.NewRequest("GET", "league", uri, lr.Region, glaw.V4)
 
-	err = c.Do(ctx, req, &league)
-	return league, err
+	err = c.client.Do(ctx, req, &l)
+	return l, err
 }
 
 // Entry
@@ -83,18 +107,18 @@ func (er EntryRequest) String() string {
 
 // Entry will grab a slice of entries. Uses the experimental api if you use challenger, master, or
 // grandmaster.
-func (c *Client) Entry(ctx context.Context, er EntryRequest) (entries []core.LeagueEntry, err error) {
+func (c *Client) GetEntry(ctx context.Context, er EntryRequest) (entries []core.LeagueEntry, err error) {
 	uri := er.String()
-	var req Request
+	var req league.Request
 
 	switch er.Tier {
 	case core.CHALLENGER, core.MASTER, core.GRANDMASTER:
-		req = NewRequest("GET", "league-exp", uri, er.Region, glaw.V4)
+		req = league.NewRequest("GET", "league-exp", uri, er.Region, glaw.V4)
 	default:
-		req = NewRequest("GET", "league", uri, er.Region, glaw.V4)
+		req = league.NewRequest("GET", "league", uri, er.Region, glaw.V4)
 	}
 
-	err = c.Do(ctx, req, &entries)
+	err = c.client.Do(ctx, req, &entries)
 	return entries, err
 }
 
@@ -118,7 +142,7 @@ func (ef *EntryFetcher) Next(ctx context.Context) (entries []core.LeagueEntry, e
 	}
 
 	ef.Request.Page++
-	entries, err = ef.client.Entry(ctx, ef.Request)
+	entries, err = ef.client.GetEntry(ctx, ef.Request)
 
 	if len(entries) == 0 {
 		ef.stop = true

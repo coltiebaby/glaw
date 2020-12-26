@@ -1,7 +1,7 @@
 // Please look at their suggested tips before running this.
 // https://developer.riotgames.com/docs/lol#riot-games-api_tournament-api
 
-package league
+package tournament
 
 import (
 	"bytes"
@@ -10,17 +10,46 @@ import (
 	"fmt"
 
 	"github.com/coltiebaby/glaw"
+	"github.com/coltiebaby/glaw/league"
 	"github.com/coltiebaby/glaw/league/core"
 )
 
-type TournamentProviderRequest struct {
+type Client struct {
+	client    *league.Client
+	IsEnabled bool
+}
+
+func New(c *league.Client) *Client {
+	return &Client{
+		client: c,
+	}
+}
+
+func NewTournamentClient(opts ...glaw.Option) (*Client, error) {
+	c, err := league.NewClient(opts...)
+	client := &Client{
+		client: c,
+	}
+
+	return client, err
+}
+
+func (c *Client) getDomain() string {
+	if c.IsEnabled {
+		return "tournament"
+	}
+
+	return "tournament-stub"
+}
+
+type ProviderRequest struct {
 	Region       glaw.Region
 	Registration core.TournamentProviderRegistration
 }
 
-func (c *Client) Provider(ctx context.Context, pr TournamentProviderRequest) (id int, err error) {
+func (c *Client) GetProvider(ctx context.Context, pr ProviderRequest) (id int, err error) {
 	uri := `providers`
-	req := NewRequest("POST", "tournament-stub", uri, pr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, pr.Region, glaw.V4)
 
 	b, err := json.Marshal(pr.Registration)
 	if err != nil {
@@ -30,18 +59,18 @@ func (c *Client) Provider(ctx context.Context, pr TournamentProviderRequest) (id
 	buf := bytes.NewBuffer(b)
 	req.Body = buf
 
-	err = c.Do(ctx, req, &id)
+	err = c.client.Do(ctx, req, &id)
 	return id, err
 }
 
-type TournamentRequest struct {
+type CreateRequest struct {
 	Region       glaw.Region
 	Registration core.TournamentRegistration
 }
 
-func (c *Client) CreateTournament(ctx context.Context, tr TournamentRequest) (id int, err error) {
+func (c *Client) Create(ctx context.Context, tr CreateRequest) (id int, err error) {
 	uri := `tournaments`
-	req := NewRequest("POST", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	b, err := json.Marshal(tr.Registration)
 	if err != nil {
@@ -51,24 +80,24 @@ func (c *Client) CreateTournament(ctx context.Context, tr TournamentRequest) (id
 	buf := bytes.NewBuffer(b)
 	req.Body = buf
 
-	err = c.Do(ctx, req, &id)
+	err = c.client.Do(ctx, req, &id)
 	return id, err
 }
 
-type TournamentCodeRequest struct {
+type CodeRequest struct {
 	Region        glaw.Region
 	TournamentId  int
 	CodesToCreate int // Defaults to 1
 	Registration  core.TournamentCodeRegistration
 }
 
-func (c *Client) CreateTournamentCode(ctx context.Context, tr TournamentCodeRequest) (codes []string, err error) {
+func (c *Client) CreateCode(ctx context.Context, tr CodeRequest) (codes []string, err error) {
 	if tr.CodesToCreate == 0 {
 		tr.CodesToCreate = 1
 	}
 
 	uri := `codes`
-	req := NewRequest("POST", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("POST", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	b, err := json.Marshal(tr.Registration)
 	if err != nil {
@@ -78,7 +107,7 @@ func (c *Client) CreateTournamentCode(ctx context.Context, tr TournamentCodeRequ
 	buf := bytes.NewBuffer(b)
 	req.Body = buf
 
-	err = c.Do(ctx, req, &codes)
+	err = c.client.Do(ctx, req, &codes)
 	return codes, err
 }
 
@@ -93,26 +122,26 @@ func StandardCodeCreation(ctx context.Context, c *Client, tournamentId int, meta
 		Metadata:      metadata,
 	}
 
-	req := TournamentCodeRequest{
+	req := CodeRequest{
 		TournamentId:  tournamentId,
 		CodesToCreate: 1,
 		Registration:  reg,
 	}
 
-	return c.CreateTournamentCode(ctx, req)
+	return c.CreateCode(ctx, req)
 }
 
-type TournamentLobbyEventRequest struct {
+type LobbyEventRequest struct {
 	Code   string
 	Region glaw.Region
 }
 
-func (c *Client) LobbyEvents(ctx context.Context, tr TournamentLobbyEventRequest) (events []core.TournamentEvent, err error) {
+func (c *Client) GetLobbyEvents(ctx context.Context, tr LobbyEventRequest) (events []core.TournamentEvent, err error) {
 	uri := fmt.Sprintf(`lobby-events/by-code/%s`, tr.Code)
-	req := NewRequest("GET", "tournament-stub", uri, tr.Region, glaw.V4)
+	req := league.NewRequest("GET", c.getDomain(), uri, tr.Region, glaw.V4)
 
 	var e core.TournamentEvents
-	err = c.Do(ctx, req, &e)
+	err = c.client.Do(ctx, req, &e)
 
 	events = e.Events
 	return events, err
