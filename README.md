@@ -65,6 +65,11 @@ func main() {
 - [v4] tournament
 - [v4] spectator
 
+### Valorant
+- val-content-v1
+- val-match-v1
+- val-status-v1
+
 
 
 ## Not Covered
@@ -79,8 +84,3 @@ func main() {
 - tft-league-v1
 - tft-match-v1
 - tft-summoner-v1
-
-### Valorant
-- val-content-v1
-- val-match-v1
-- val-status-v1
