@@ -38,7 +38,7 @@ type MatchRequest struct {
 func (c *Client) GetRecent(ctx context.Context, mr MatchRequest) (value core.RecentMatches, err error) {
 	uri := fmt.Sprintf(`recent-matches/by-queue/%s`, mr.Queue)
 
-	req := league.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
+	req := valorant.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
 
 	err = c.client.Do(ctx, req, &value)
 	return value, err
@@ -47,7 +47,7 @@ func (c *Client) GetRecent(ctx context.Context, mr MatchRequest) (value core.Rec
 func (c *Client) Get(ctx context.Context, mr MatchRequest) (value core.Match, err error) {
 	uri := fmt.Sprintf(`matches/%s`, mr.Id)
 
-	req := league.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
+	req := valorant.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
 
 	err = c.client.Do(ctx, req, &value)
 	return value, err
@@ -56,7 +56,7 @@ func (c *Client) Get(ctx context.Context, mr MatchRequest) (value core.Match, er
 func (c *Client) GetMatchlist(ctx context.Context, mr MatchRequest) (value core.Matchlist, err error) {
 	uri := fmt.Sprintf(`matchlists/by-puuid/%s`, mr.Queue)
 
-	req := league.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
+	req := valorant.NewRequest("GET", "match", uri, mr.Region, glaw.V1)
 
 	err = c.client.Do(ctx, req, &value)
 	return value, err

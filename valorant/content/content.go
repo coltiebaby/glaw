@@ -35,11 +35,11 @@ type ContentRequest struct {
 
 func (c *Client) Get(ctx context.Context, cr ContentRequest) (value core.Content, err error) {
 	uri := `contents`
-	if r.Locale != "" {
-		uri = fmt.Sprintf(`%s?locale="%s"`, uri, r.Locale)
+	if cr.Locale != "" {
+		uri = fmt.Sprintf(`%s?locale="%s"`, uri, cr.Locale)
 	}
 
-	req := league.NewRequest("GET", "content", uri, cr.Region, glaw.V1)
+	req := valorant.NewRequest("GET", "content", uri, cr.Region, glaw.V1)
 
 	err = c.client.Do(ctx, req, &value)
 	return value, err

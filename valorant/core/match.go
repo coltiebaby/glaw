@@ -241,7 +241,7 @@ func (kill *Kill) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	k.TimeSinceGameStart = time.Duration(p.TimeSinceGameStart) * timeMillisecond
+	k.TimeSinceGameStart = time.Duration(p.TimeSinceGameStart) * time.Millisecond
 	k.TimeSinceRoundStart = time.Duration(p.TimeSinceRoundStart) * time.Millisecond
 
 	*kill = k
