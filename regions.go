@@ -11,6 +11,15 @@ func (r Region) Base() string {
 	return fmt.Sprintf(`%s.api.riotgames.com`, strings.ToLower(RegionsPlatform[r]))
 }
 
+func (r Region) Valorant() string {
+	val, ok := Valorant[r]
+	if !ok {
+		val = Valorant[REGION_NA]
+	}
+
+	return fmt.Sprintf(`%s.api.riotgames.com`, strings.ToLower(val))
+}
+
 func (r Region) String() string {
 	return Regions[r]
 }
@@ -27,11 +36,23 @@ const (
 	REGION_OCE
 	REGION_TR
 	REGION_RU
+	REGION_AP
+	REGION_EU
+	REGION_LATAM
 	REGION_PBE
 	REGION_AMERICAS
 	REGION_ASIA
 	REGION_EUROPE
 )
+
+var Valorant = map[Region]string{
+	REGION_NA:    `na`,
+	REGION_AP:    `ap`,
+	REGION_BR:    `br`,
+	REGION_EU:    `eu`,
+	REGION_KR:    `kr`,
+	REGION_LATAM: `latam`,
+}
 
 var Regions = map[Region]string{
 	REGION_NA:       `NA`,
@@ -45,6 +66,9 @@ var Regions = map[Region]string{
 	REGION_OCE:      `OCE`,
 	REGION_TR:       `TR`,
 	REGION_RU:       `RU`,
+	REGION_AP:       `AP`,
+	REGION_EU:       `EU`,
+	REGION_LATAM:    `LATAM`,
 	REGION_PBE:      `PBE`,
 	REGION_AMERICAS: "americas",
 	REGION_ASIA:     "asia",
