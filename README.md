@@ -70,6 +70,9 @@ func main() {
 - val-match-v1
 - val-status-v1
 
+### TFT
+- tft-summoner-v1
+
 
 
 ## Not Covered
@@ -83,4 +86,3 @@ func main() {
 ### TFT
 - tft-league-v1
 - tft-match-v1
-- tft-summoner-v1
