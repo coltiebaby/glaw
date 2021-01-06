@@ -23,8 +23,8 @@ func main() {
 	}
 
 	client, _ := api.NewTeamFightTactics(opts...)
-	req := rank.QueueRequest {
-        Tier:   core.CHALLENGER,
+	req := rank.QueueRequest{
+		Tier:   core.CHALLENGER,
 		Region: glaw.REGION_NA,
 	}
 

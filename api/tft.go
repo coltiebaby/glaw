@@ -8,7 +8,7 @@ import (
 )
 
 type TeamFightTactics struct {
-    Rank     *rank.Client
+	Rank     *rank.Client
 	Summoner *summoner.Client
 }
 
@@ -20,7 +20,7 @@ func NewTeamFightTactics(opts ...glaw.Option) (*TeamFightTactics, error) {
 
 	tftclient := &TeamFightTactics{
 		Summoner: summoner.New(client),
-        Rank:     rank.New(client),
+		Rank:     rank.New(client),
 	}
 
 	return tftclient, nil

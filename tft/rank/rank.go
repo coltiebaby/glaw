@@ -3,7 +3,7 @@ package rank
 import (
 	"context"
 	"fmt"
-    "strings"
+	"strings"
 
 	"github.com/coltiebaby/glaw"
 	"github.com/coltiebaby/glaw/tft"
@@ -107,7 +107,7 @@ func (er EntryRequest) String() string {
 // grandmaster.
 func (c *Client) GetEntry(ctx context.Context, er EntryRequest) (entries []core.Entry, err error) {
 	uri := er.String()
-    req := tft.NewRequest("GET", "league", uri, er.Region, glaw.V1)
+	req := tft.NewRequest("GET", "league", uri, er.Region, glaw.V1)
 
 	err = c.client.Do(ctx, req, &entries)
 	return entries, err
